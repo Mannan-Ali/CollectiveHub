@@ -1,0 +1,28 @@
+This file is mainly for notes and why the follwing folders are made and etc.
+
+Inside Source:
+1. Controllers :  mainly functionality 
+2. db : database connection (moslty same for mongo or postgress)
+    -> index.js : this file is used to implement the db connection which is imported in index.js of src
+3. middleware : mostly for verfication of what kind of req and etc
+4. models : for data modelling 
+5. routes : get post in different folder as from here they will get complex.
+6. utils : utilities files like that can be used multiple times like 
+           file upload , mailing , tokens handling 
+
+
+7. Prettier : (Not the vs code one but the plugin in nodejs)
+why do we use it ?
+when we code professionally lot of people work on a single project 
+so what happens is like someone does not put ; in js files but others do so we 
+can declare in Prettier that always end with ; 
+
+-> we can make our custom pretier 
+ :-> run npm i -D Prettier
+ :-> now we need to create a 2 files
+    a. .prettierrc : here will we write what we need even if we forget to do like trailling commas wherever needed
+    b. /prettierignore : which file should be ignored 
+
+
+8. Constans.js : it stores the variable that will be used in many files so if changes will be needed 
+we can directly can it in constants its just like env but it is not hided
