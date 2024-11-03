@@ -26,3 +26,17 @@ can declare in Prettier that always end with ;
 
 8. Constans.js : it stores the variable that will be used in many files so if changes will be needed 
 we can directly can it in constants its just like env but it is not hided
+
+
+9. middleware : (can aslo be called verfication or checking like if req has xyz than olny send res)
+   ->when the req is made to the server 
+   ->before sending the res to the browser what we can do is check if 
+   ->the browser is worty of the data or can the browser understand the data 
+   ->who is the browser or whos frontend it is using this middleware 
+   ->
+This all happens in between when the req is made and res is send 
+ 
+
+10. In total app.get/post etc we have ( err,req,res,next)
+    we know that next is used to tell the compilar to move onto the next function or next line of code we are 
+    done here mostly used with custom middlewares 
