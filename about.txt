@@ -40,3 +40,8 @@ This all happens in between when the req is made and res is send
 10. In total app.get/post etc we have ( err,req,res,next)
     we know that next is used to tell the compilar to move onto the next function or next line of code we are 
     done here mostly used with custom middlewares 
+
+11. Now we will work on models , here points to remember are
+-> the photos and vidoes will be stroed on 3rd party apps like aws and 
+   in return we will get a link that we will store in db 
+   Model link : https://app.eraser.io/workspace/YtPqZ1VogxGy1jzIDkzj
