@@ -45,3 +45,82 @@ This all happens in between when the req is made and res is send
 -> the photos and vidoes will be stroed on 3rd party apps like aws and 
    in return we will get a link that we will store in db 
    Model link : https://app.eraser.io/workspace/YtPqZ1VogxGy1jzIDkzj
+
+12. mongoose-aggregate-paginate-v2 :  add-on for Mongoose that simplifies pagination
+
+ -> When you work with a lot of data in a database, 
+you might want to show only a little bit at a time, 
+like showing 10 users per page on a website. 
+This process is called pagination. The mongoose-aggregate-paginate-v2 package is a tool that makes 
+pagination easier when you’re using Mongoose (a library for MongoDB,
+ a popular database) with aggregation (a way to get more advanced results from the database).
+
+ -> Why Use It?
+Imagine you have 1,000 users in your database. You don’t want to load all of them at once because it would be too slow.
+Instead, you can use pagination to show, say, 10 users at a time.
+If you’re using aggregation to filter or sort your data in complex ways, 
+pagination can be tricky. 
+This package helps you add pagination to those complex queries easily.
+
+ => USED IN VIDOES.MODEL.JS 
+
+
+13. jsonwebtoken (JWT for short)
+
+   ->Think of JWT as a digital "pass" that says, 
+   "Yes, this person is allowed to be here." Here’s how it works:
+   
+    ->Login & Create a Token: 
+
+    When a user logs in, the server checks their username and password. 
+    If they’re correct, the server creates a token (a long string that looks like gibberish) using jsonwebtoken. 
+    This token is like a unique pass for the user.
+
+   -> ttoken is only created once for 1 user?
+
+   No, a JWT token is not created just once for a user. Here’s how it typically works:
+   Each Login Creates a New Token: Every time a user logs in, the backend usually creates a new JWT token for them. This token has an expiration time, so it’s only valid for a certain period (like 1 hour or 1 day).
+   
+   ->Expiration and Renewal:
+
+   When the token expires, the user needs a new one. They may get a new token by logging in again or sometimes by refreshing it if a "refresh token" system is used.
+   This way, if someone’s token gets stolen, it will only work until it expires, adding an extra layer of security.
+
+14. bcrypt:
+     ->Passwords need to be protected because you don’t want anyone to easily read or steal them. This is where bcrypt helps out:
+     ->Hashing: 
+     When a user creates a password, bcrypt takes the password and changes it into a unique scrambled version called a hash (imagine mixing up the letters into something that looks random). 
+     The actual password is never saved, only this hash version.
+     ->Verifying the Password: 
+     When the user logs in, bcrypt takes the password they typed, hashes it the same way, and checks if it matches the stored hash. If it does, they’re allowed to log in. 
+
+
+
+
+13 and 14 part together : . when we have unique passwrd then why do we need toke n?
+
+Great question! Let’s break down why we need both a password and a token.
+
+ 1. Passwords - For Logging In
+ Purpose: The password is used to identify and verify a user. When a user first logs in, they enter their password to prove they are who they say they are.
+ One-Time Check: Once the password is verified at login, we don’t want to ask the user for it over and over because that’s annoying and insecure (passwords can be intercepted if sent frequently).
+ 
+ 2. Tokens - For Staying Logged In Securely
+ Purpose: The token acts like a "temporary pass" to allow the user to access secure parts of the app without needing to re-enter their password.
+ Convenience and Security: After the user logs in, they get a token that’s stored securely on their device. When they visit secure pages or make requests, they just send the token instead of their password.
+
+User Signs Up: Password is hashed with bcrypt and stored safely.
+User Logs In: If the password matches, the server creates a JWT token for them.
+
+
+15. Mongoose Pre MiddleWare:
+
+The pre middleware lets you do something before an action happens on a document (like before saving or updating it).
+
+How pre Middleware Works
+Think of pre middleware as a checklist for Mongoose that says, “Before you do X, make sure you do Y first.” Here’s how it might work:
+
+ ** "Main reson we are using pre here" : 
+    Define a Schema and Add Pre Middleware: Let’s say you’re creating a user schema with fields like username and password.
+    Before Saving: You want to hash the password every time it’s saved so that it’s not stored as plain text. 
+    pre middleware can automatically hash the password before it’s saved to the database.

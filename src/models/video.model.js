@@ -1,54 +1,47 @@
 import mongoose from "mongoose";
+import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 
-const userSchema = new mongoose.Schema(
+const videoSchema = new mongoose.Schema(
     {
-        username : {
-            type : String,
-            required : [true, 'UserName  is required '],
-            lowercase : true,
-            unique : [true, 'Enter Unique name '],
-            trim : true,
-            index : true // makes it easy to search like if you know this data will be used 
-            // for searching then do index true
+        videoFile : {
+            type : String, //cloudinary url
+            required : [true, "videoFile is required"],
         },
-        email : {
+
+        thumbnail : {
             type : String,
-            required : [true, 'email is required '],
-            lowercase : true,
-            unique : true,
-            trim : true // removes leading and trailling whitespaces
+            required : [true, "thumbnail is required"],
         },
-        fullName : {
-            type : String,
-            required : true,
-            lowercase : true,
-            trim : true,
-            index : true
+        title : {
+            type : String, 
+            required : [true, "title is required"],
         },
-        avatar : {
-            type : String, // using cloudniary url 
+        description : {
+            type : String, 
+            required : [true, 'description  is required '],
+        },
+        duration : { // this we get from cloudinary as when it stores something 
+            // it returns time , url and stuff we will take it from there 
+            type : Number,
             required : true,
         },
-        coverImage : {
-            type : String, // using cloudniary url 
+        views : {
+            type : Number,
+            default : 0
         },
-        watchHistory : [ //this is array as we will keep adding this value 
-            { 
-                type : mongoose.Schema.Types.ObjectId,
-                ref : "Video",
-            }
-        ],
-        //challenge : how we will encrypt the password as in database there  should be encryption and 
-        // real password to match
-        password : {
-            type : String,
-            required : [true, 'Password is required ']
+        isPublished : {
+            type : Boolean,
+            default : true,
         },
-        refreshToken : {
-            type : String,
-        }
+        owner : {
+            type : mongoose.Schema.Types.ObjectId, 
+            ref : "User",
+        },
 
     },
-    { timestamps: true })
+    { timestamps: true }
+)
+//we can only use Mongooseaggreagate with plugin
+videoSchema.plugin(mongooseAggregatePaginate)
 
-    export const User = mongoose.model("User", userSchema)
+export const Video = mongoose.model("Video", videoSchema)
