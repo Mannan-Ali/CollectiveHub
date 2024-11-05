@@ -1,4 +1,5 @@
 /*
+THIS FILE WAS MADE MAINLY TO BE USED IN CONTROLLER
 The technique of enclosing a function inside another function, 
 as seen in your asynHandler, 
 is often referred to as function wrapping or higher-order functions.
@@ -17,15 +18,14 @@ if no erros occurs it gets executed here
 
 //2.1] way here using promise 
 const asynHandler = (reqhandler) => {
-    (req,res,next)=>{
+    return ((req,res,next)=>{
         Promise.resolve(reqhandler(req,res,next))
         .catch((err)=>{
            next(err) 
         })
-    }
-
+    })
 }
-export default asynHandler
+export {asynHandler}
 
 /*2.2]
 const asynHandler = (reqhandler) => {

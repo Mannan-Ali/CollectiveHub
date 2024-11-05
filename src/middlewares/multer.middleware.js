@@ -1,5 +1,5 @@
 /*
-NOTE L IN THE FOLLWING FOLDER WE ARE JUST DEALING WITH HOW TO GET OR HALDLE THE FILE UPLOAD (AS FROM THE REQ.BODY AS EXPRESS DOES NOT DO THAT) IN THE LOCAL FILE THE CODE FOR UPLOAD IN CLOUDINARY IS iIN cloudinary.js
+NOTE : IN THE FOLLWING FOLDER WE ARE JUST DEALING WITH HOW TO GET OR HALDLE THE FILE UPLOAD (AS FROM THE REQ.BODY AS EXPRESS DOES NOT DO THAT) IN THE LOCAL FILE THE CODE FOR UPLOAD IN CLOUDINARY IS iIN cloudinary.js
 HERE WE WILL RECEIVE THE FILE -> LOCAL FILE (WHICH THEN WILL BE SEND TO CLOUDINARY FROM LOCAL FILES) -> CLOUDINARY (USING CLOUDINARY METHOD)
 as before sending data to user or storing data in db what we need 
 to some things we data so we will use multer as middleware
@@ -37,4 +37,3 @@ export const upload = multer({ storage: storage })
 3. the local file will be deleted in very short period of time 
 */
 
-//app

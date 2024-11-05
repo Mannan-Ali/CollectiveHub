@@ -8,20 +8,20 @@ const app = express();
 
 app.use(cors({
     //which which origins we are allowing it to access data from our server
-    origin : process.env.CORS_ORIGIN ,
-    credentials : true
+    origin: process.env.CORS_ORIGIN,
+    credentials: true
 }))
 
 //now the data we will get on our server will be in different format like some will
 //be from params some in json form some in form body etc . now if we are taking json data
 //then we will like to limit the amount of json data that is done using this 
 //to do this we have used body-parser but now it can be direclty done in express
-app.use(express.json({limit : "16kb"}))
+app.use(express.json({ limit: "16kb" }))
 
 //for URL : now we know in url we get data in encoded form like ?wfwewefe
 // so here we needed to tell the server take care of those reqs that are coming directly 
 //from url to decode it
-app.use(express.urlencoded({extended: true, limit : "16kb"}))
+app.use(express.urlencoded({ extended: true, limit: "16kb" }))
 
 /*
 we have seen this before in web dev course : it is used so that the static files 
@@ -40,7 +40,18 @@ app.use(express.static("public"))
 //incoming request from the client side (browser).
 //mainly the cookies are secure cooikies that can read and implemented by servers
 app.use(cookieParser())
-export {app} ;
+
+//routes 
+import { router } from "./routes/user.routes.js";
+
+//routes declaration
+//NOTE : now as everthing is in different file you will have to use app.use that 
+//is a middleware instead of get,post to bring evething together
+
+app.use("/api/v1/users",router)
+//Now what happens is using middle ware we are on router localhost:8000/api/v1/users which will call 
+//routers in user.router.js go there
+export { app };
 
 
 

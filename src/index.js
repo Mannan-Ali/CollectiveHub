@@ -3,6 +3,7 @@ import 'dotenv/config'
 //imdediately so importing here at first is important
 import express from 'express'
 import connectDB from './db/index.js'
+import {app} from "./app.js"
 
 
 // Now when call this function its asyncronus so we also get promise in retun
