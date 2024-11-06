@@ -67,7 +67,7 @@ userSchema.pre("save", async function (next ){
     //is changed hence it is important
     if(!this.isModified("password")) return next(); 
     //bcrypt.hash(this.password, 10) 10 is the total rounds 
-    this.password = bcrypt.hash(this.password, 10)
+    this.password = await bcrypt.hash(this.password, 10)
     next()
 })
 //now we encrptyed the password but the user on frontend will type 
