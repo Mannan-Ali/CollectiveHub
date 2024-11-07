@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 
 const userSchema = new mongoose.Schema(
     {
-        username : {
+        userName : {
             type : String,
             required : [true, 'UserName  is required '],
             lowercase : true,
@@ -62,7 +62,7 @@ use this , it does not get reference to this so how will we access userSchema va
 async : as it takes tile 
 next : as this is a middleware 
 */
-userSchema.pre("save", async function (next ){
+userSchema.pre("save", async function (next){
     // without this the code will even encrypt when basics like avatar or name 
     //is changed hence it is important
     if(!this.isModified("password")) return next(); 

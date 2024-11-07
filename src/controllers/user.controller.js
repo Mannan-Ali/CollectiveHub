@@ -4,9 +4,10 @@ as we dont have frontend we will be using postman
 */
 import { asynHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
-import { User } from "../models/user.model.js";
-import { uploadOnCloudinary} from "../utils/cloudinary.js"
+import { User } from "../models/user.model.js"
+import uploadOnCloudinary from "../utils/cloudinary.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
+import path from "path";
 //steps for register user :- 
 //get user detail from frontend 
 //we need everything from user defined in user db other than watchistory and refreshTOken
@@ -29,9 +30,10 @@ const registerUser = asynHandler(async (req, res) => {
     // }
     //better approach other than doing all ifs
     //some returns boolen value read on google
-    if ([userName, fullName, email, password].some((field) => {
-        return field.trim() === ""
-    })) {
+    if (
+        [userName, fullName, email, password].some((field) =>
+        field?.trim() === "")
+    ){
         throw new ApiError(400, "You missed some filed please fill them !!!")
     }
 
@@ -48,21 +50,28 @@ const registerUser = asynHandler(async (req, res) => {
     //req.files these files we get bcoz of multer its not from express 
     //the avatar is the one declared with same name in routes user
     //avatar[0] bcoz we are returnd an arrya kind and we only need the url or path that is the 1st valeu
-    const avatarLocalPath = req.files?.avatar[0]?.path
+    const avatarLocalPath = req.files?.avatar[0]?.path;
+    console.log(path.normalize(avatarLocalPath))
     ///for cover image 
     const coverImageLocalPath = req.files?.coverImage[0]?.path
+    // let coverImageLocalPath;
+    // if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length>0){
+    //     coverImageLocalPath = req.files.coverImage[0].path
+    // }
     //check if avatar is received
     if(!avatarLocalPath){
         throw new ApiError(400,"Avatar file is required")
     }
     //upload on cloudinary
     //we have wrote the basic code in cloudinary.js in utils
-    const avatar = await uploadOnCloudinary(avatarLocalPath)
+    const avatar = await uploadOnCloudinary(avatarLocalPath);
     const coverImage = await uploadOnCloudinary(coverImageLocalPath)
+    console.log(avatar)
+    console.log(coverImage)
 
     //checking again if avatar is send or not on db
     if(!avatar){
-        throw new ApiError(400,"Avatar file is required")
+        throw new ApiError(400,"aaavatar file is required")
     }
     const user = await User.create(
         {

@@ -25,7 +25,7 @@ const storage = multer.diskStorage({
     }
 })
 
-export const upload = multer({ storage: storage })
+export const upload = multer({ storage, })
 
 /*
 1. the parameter file helps us configer the file,i.e , 
