@@ -53,11 +53,11 @@ const registerUser = asynHandler(async (req, res) => {
     const avatarLocalPath = req.files?.avatar[0]?.path;
     console.log(path.normalize(avatarLocalPath))
     ///for cover image 
-    const coverImageLocalPath = req.files?.coverImage[0]?.path
-    // let coverImageLocalPath;
-    // if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length>0){
-    //     coverImageLocalPath = req.files.coverImage[0].path
-    // }
+    // const coverImageLocalPath = req.files?.coverImage[0]?.path
+    let coverImageLocalPath;
+    if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length>0){
+        coverImageLocalPath = req.files.coverImage[0].path
+    }
     //check if avatar is received
     if(!avatarLocalPath){
         throw new ApiError(400,"Avatar file is required")
@@ -66,8 +66,8 @@ const registerUser = asynHandler(async (req, res) => {
     //we have wrote the basic code in cloudinary.js in utils
     const avatar = await uploadOnCloudinary(avatarLocalPath);
     const coverImage = await uploadOnCloudinary(coverImageLocalPath)
-    console.log(avatar)
-    console.log(coverImage)
+
+    
 
     //checking again if avatar is send or not on db
     if(!avatar){
