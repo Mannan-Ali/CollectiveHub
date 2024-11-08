@@ -73,8 +73,7 @@ userSchema.pre("save", async function (next){
 //now we encrptyed the password but the user on frontend will type 
 // password in string form only so how to compare both- so we create a method isPasswordCorrect using mongoose
 //BASIC SYMTAX FOR :  creating method is SchemaName.method.method_name
-userSchema.method.isPasswordCorrect = async function
-(password){
+userSchema.methods.isPasswordCorrect = async function(password){
     return await bcrypt.compare(password,this.password)//one is password passed by user and other is encrypted one
 }
 
@@ -91,8 +90,8 @@ Now refresh token will be stored in db thats why it is there in model
 but access token will not be stored ,we are ussing botn session and cookies so 
 
 */
-userSchema.method.generateAccessToken = function(){
-    jwt.sign(
+userSchema.methods.generateAccessToken = function(){
+    return jwt.sign(
         {
             _id : this._id,
             email : this.email,
@@ -101,18 +100,18 @@ userSchema.method.generateAccessToken = function(){
         },
         process.env.ACCESS_TOKEN_SECRET,
         {
-            expiresIn : ACCESS_TOKEN_EXPIRY
+            expiresIn :process.env.ACCESS_TOKEN_EXPIRY
         }
     )
 }
-userSchema.method.generateRefreshToken = function(){
-    jwt.sign(
+userSchema.methods.generateRefreshToken = function(){
+    return jwt.sign(
         {
             _id : this._id,
         },
         process.env.ACCESS_TOKEN_SECRET,
         {
-            expiresIn : ACCESS_TOKEN_EXPIRY
+            expiresIn :process.env.ACCESS_TOKEN_EXPIRY
         }
     )
 }

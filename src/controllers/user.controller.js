@@ -140,9 +140,11 @@ const loginUser = asynHandler(async (req, res) => {
     6. send access and refresh in form of secure of cookies
     */
     const { userName, email, password } = req.body;
+    console.log(email);
+    
     //checking for anyone is provided or not
     //if you need only one like email remove username
-    if (!userName || !email) {
+    if (!userName && !email) {
         throw new ApiError(400, "Need Anyone of the Entries : UserName or Email")
     }
     //find the user on basis of req.body received
@@ -185,7 +187,7 @@ const loginUser = asynHandler(async (req, res) => {
         .cookie("accessToken", accessToken, options)
         .cookie("refreshToken", refreshToken, options)
         .json(
-            ApiResponse(200,
+            new ApiResponse(200,
                 //data field
                 {
                     user: loggedInUser, accessToken, refreshToken
@@ -203,7 +205,7 @@ const logOutUser = asynHandler(async (req,res)=>{
         //to what 
         {
             $set: {
-                refreshToken : undefined
+                refreshToken: null,
             }
         },
         {
@@ -214,7 +216,7 @@ const logOutUser = asynHandler(async (req,res)=>{
     //2. delete the secure cookies 
     const options = {
         httpOnly: true,
-        secure: true,
+        secure: true
     }
     return res.status(200)
     .clearCookie("refreshToken",options)

@@ -3,13 +3,12 @@ import { asynHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js"
 import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
 export const verifyJWT = asynHandler(async (req, res, next) => {
     try {
         //remeber the appbewery where we set  AUthencation for level4 as bearear token this req.header is same thing we are checking if someone sends using Authentication
         //Authorization : bearber token
-        const token = req.cookies?.accessToken || req.headers("Authorization")?.replace("Bearer", "");
-
+        const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "")
+        console.log(token)
         if (!token) {
             throw new ApiError(401, "Unauthorized Request")
         }
@@ -17,8 +16,8 @@ export const verifyJWT = asynHandler(async (req, res, next) => {
         const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET)
         //now here we accessed the id of the user using accessToken and aslo verified that user exits
         //problem in logout solved
-        const user = await User.findById(decodedToken?._id).select
-            ("-password -refreshToken") //as accessToken was created with lot of information like _id,username etc
+        const user = await User.findById(decodedToken?._id).select("-password -refreshToken") 
+        //as accessToken was created with lot of information like _id,username etc
 
         if (!user) {
             throw new ApiError(401, "Invalid Access Token")
@@ -26,9 +25,9 @@ export const verifyJWT = asynHandler(async (req, res, next) => {
         //instead of returning we are adding new object in req, like there is req.body , req.files(multer)
         //as this is our own middleware we can do that : added user object to req
         req.user = user;
-        next()
+        next();
     } catch (error) {
-        throw new ApiError(401,erro?.message || "Invalid access Token")
+        throw new ApiError(401,error?.message || "Invalid access Token")
     }
 })
 

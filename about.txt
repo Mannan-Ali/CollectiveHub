@@ -124,3 +124,7 @@ Think of pre middleware as a checklist for Mongoose that says, “Before you do 
     Define a Schema and Add Pre Middleware: Let’s say you’re creating a user schema with fields like username and password.
     Before Saving: You want to hash the password every time it’s saved so that it’s not stored as plain text. 
     pre middleware can automatically hash the password before it’s saved to the database.
+
+
+16. Here note this (req,res,next) lets say inside a finction we are only usigng req and next and res is not used
+   so what we can do is pss it like this (req,_, next)
