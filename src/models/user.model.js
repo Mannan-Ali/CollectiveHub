@@ -56,14 +56,14 @@ const userSchema = new mongoose.Schema(
 what are we doing here is that 1 parameter is save there are more such 
 paramerter like Update on,delete . Here we are telling when the db is going 
 to save data just before that we need to perfom the follwing function 
-Now the funcion shold not be ()=> anynomuos bcoz inside anynomyus func we cannot 
+Now the funcion should not be ()=> anynomuos bcoz inside anynomyus func we cannot 
 use this , it does not get reference to this so how will we access userSchema vallue 
 
 async : as it takes tile 
 next : as this is a middleware 
 */
 userSchema.pre("save", async function (next){
-    // without this the code will even encrypt when basics like avatar or name 
+    // without this the code will even encrypt when basics like avatar or name for everytime
     //is changed hence it is important
     if(!this.isModified("password")) return next(); 
     //bcrypt.hash(this.password, 10) 10 is the total rounds 
@@ -120,6 +120,7 @@ userSchema.method.generateRefreshToken = function(){
 export const User = mongoose.model("User", userSchema)
 
 //REFREHS TOKEN AND ACCESS TOKEN 
+// when the users accesstoken expire he can go to an endpoint if refresh token not expired then give new access token
 /* 
 What Are Access Tokens and Refresh Tokens?
 Access Token: This is like a short-term pass that lets the user access the app. It contains basic user info, like ID and email, and has a short expiration time (often minutes or hours). It’s used to make requests to the server without logging in every time.
