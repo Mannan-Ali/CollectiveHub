@@ -180,18 +180,28 @@ const loginUser = asynHandler(async (req, res) => {
         //but when this 2 are set true only the server can modify this cookies
         //not possible by frontend
     }
+    //we are able to use this cookies as app.js has cookieparser 
     return res.status(200)
         .cookie("accessToken", accessToken, options)
         .cookie("refreshToken", refreshToken, options)
         .json(
-            ApiResponse(200, {
-                user: loggedInUser, accessToken, refreshToken
-            }, "User Logged in Successfully"
+            ApiResponse(200,
+                //data field
+                {
+                    user: loggedInUser, accessToken, refreshToken
+                },
+                "User Logged in Successfully"
             )
         )
-
 })
 
+const logOutUser = asynHandler((req,res)=>{
+    //1. delete the secure cookies 
+    //2. reset the refreshToken in database to empty
+
+    //problem here how are we suppose to know delete user without refrence , and we cannot give form for this as 1. its not good and second user can any UserID and that will get deleted
+    //solution : here we create our own middleware check middleware with name auth 
+})
 //Access and Refresh token and why in cookies
 /*
 
