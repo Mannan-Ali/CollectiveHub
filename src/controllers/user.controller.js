@@ -195,16 +195,39 @@ const loginUser = asynHandler(async (req, res) => {
         )
 })
 
-const logOutUser = asynHandler((req,res)=>{
-    //1. delete the secure cookies 
-    //2. reset the refreshToken in database to empty
+const logOutUser = asynHandler(async (req,res)=>{
+    //1. reset the refreshToken in database to empty
+    await User.findByIdAndUpdate(
+        //what to update
+        req.user._id,
+        //to what 
+        {
+            $set: {
+                refreshToken : undefined
+            }
+        },
+        {
+            new : true
+            //this way we are sending the new updated value that is refreshToken to undefined 
+        }
+    )
+    //2. delete the secure cookies 
+    const options = {
+        httpOnly: true,
+        secure: true,
+    }
+    return res.status(200)
+    .clearCookie("refreshToken",options)
+    .clearCookie("accessToken",options)
+    .json(
+        new ApiResponse(200,{},"User logged Out ")
+    )
 
     //problem here how are we suppose to know delete user without refrence , and we cannot give form for this as 1. its not good and second user can any UserID and that will get deleted
     //solution : here we create our own middleware check middleware with name auth 
 })
 //Access and Refresh token and why in cookies
 /*
-
 nd also when we can send in json return why are we sending cokkies?
 ChatGPT said:
 ChatGPT

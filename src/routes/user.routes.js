@@ -23,6 +23,7 @@ router.route("/register").post(
 //create many routes withot duplicates
 router.route("/LogIn").post(loginUser)
 router.route("/LogOut").post(verifyJWT, logOutUser)
+//now we can access req.user in controller in logOut
 export { router }
 
 //basic defination in app.js and user controller
