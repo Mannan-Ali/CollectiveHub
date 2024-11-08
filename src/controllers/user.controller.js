@@ -236,4 +236,4 @@ The server checks this access token to verify if the user is authenticated. If t
 */
 
 
-export { registerUser, loginUser }
+export { registerUser, loginUser,logOutUser}

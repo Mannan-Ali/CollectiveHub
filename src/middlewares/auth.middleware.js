@@ -4,11 +4,11 @@ import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js"
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-export const verifyJWT = asyncHandler((req, res, next) => {
+export const verifyJWT = asynHandler(async (req, res, next) => {
     try {
         //remeber the appbewery where we set  AUthencation for level4 as bearear token this req.header is same thing we are checking if someone sends using Authentication
         //Authorization : bearber token
-        const token req.cookies?.accessToken || req.headers("Authorization")?.replace("Bearer", "")
+        const token = req.cookies?.accessToken || req.headers("Authorization")?.replace("Bearer", "");
 
         if (!token) {
             throw new ApiError(401, "Unauthorized Request")
@@ -32,7 +32,7 @@ export const verifyJWT = asyncHandler((req, res, next) => {
     }
 })
 
-//we will use this in routes
+//we will use this in routes in users in route logOut
 
 //why did we made this file 
 /*
