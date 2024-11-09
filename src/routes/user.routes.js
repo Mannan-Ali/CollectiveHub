@@ -3,7 +3,7 @@ Check user controller before this
 */
 
 import { Router } from "express";
-import { registerUser, loginUser, logOutUser } from "../controllers/user.controller.js";
+import { registerUser, loginUser, logOutUser,refreshAccessToken } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 const router = Router()
@@ -23,6 +23,7 @@ router.route("/register").post(
 //create many routes withot duplicates
 router.route("/LogIn").post(loginUser)
 router.route("/LogOut").post(verifyJWT, logOutUser)
+router.route("/RefreshAccessToken").post(refreshAccessToken)
 //now we can access req.user in controller in logOut
 export { router }
 

@@ -8,6 +8,7 @@ import { User } from "../models/user.model.js"
 import uploadOnCloudinary from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import path from "path";
+import jwt from "jsonwebtoken";
 
 //creating method for access and refresh token which is used in loginUser
 //here we are not useing asyncHandler bcoz no web request is made it us for this file only
@@ -129,7 +130,6 @@ const registerUser = asynHandler(async (req, res) => {
     )
 })
 
-
 const loginUser = asynHandler(async (req, res) => {
     /*TODOS
     1. get data from req body
@@ -140,8 +140,7 @@ const loginUser = asynHandler(async (req, res) => {
     6. send access and refresh in form of secure of cookies
     */
     const { userName, email, password } = req.body;
-    console.log(email);
-    
+
     //checking for anyone is provided or not
     //if you need only one like email remove username
     if (!userName && !email) {
@@ -197,7 +196,7 @@ const loginUser = asynHandler(async (req, res) => {
         )
 })
 
-const logOutUser = asynHandler(async (req,res)=>{
+const logOutUser = asynHandler(async (req, res) => {
     //1. reset the refreshToken in database to empty
     await User.findByIdAndUpdate(
         //what to update
@@ -209,7 +208,7 @@ const logOutUser = asynHandler(async (req,res)=>{
             }
         },
         {
-            new : true
+            new: true
             //this way we are sending the new updated value that is refreshToken to undefined 
         }
     )
@@ -219,15 +218,87 @@ const logOutUser = asynHandler(async (req,res)=>{
         secure: true
     }
     return res.status(200)
-    .clearCookie("refreshToken",options)
-    .clearCookie("accessToken",options)
-    .json(
-        new ApiResponse(200,{},"User logged Out ")
-    )
+        .clearCookie("refreshToken", options)
+        .clearCookie("accessToken", options)
+        .json(
+            new ApiResponse(200, {}, "User logged Out ")
+        )
 
     //problem here how are we suppose to know delete user without refrence , and we cannot give form for this as 1. its not good and second user can any UserID and that will get deleted
     //solution : here we create our own middleware check middleware with name auth 
 })
+
+//when the refreshToken expires we will (checkNotebook) : controller for refreh access token 
+const refreshAccessToken = asynHandler(async (req, res) => {
+    const incomingRefrehToken = req.cookies.refreshToken || req.body.refreshToken // for mobile or postman
+    if (!incomingRefrehToken) {
+        throw new ApiError(401, "Unauthoriez request in refrehAccess Token")
+    }
+    //verify token
+    /*
+    //what we did here is passed specific users refrehToken and decoded it 
+    //what actually happens is we have already send res with user unique id and also refrehToken
+    //now we are verifying that 3 things
+    hen you call jwt.verify, you are decrypting the token to see if it:
+
+    Matches the expected format and signature (based on ACCESS_TOKEN_SECRET).
+    Has a valid payload (the _id in this case).
+    Is not expired.
+
+
+    Correct, the verification part in this code does not directly involve the database. Here’s how it works:
+
+    Verification Process: When you use jwt.verify, you’re verifying the token’s structure, signature, and expiration status based solely on the token itself and the secret key (ACCESS_TOKEN_SECRET). This step ensures:
+
+    The token was issued by your server (because it was signed with your secret).
+
+    The token validity (whether it's expired or not) is determined during the jwt.verify process. Here’s how that works:
+
+    Expiration Check: When you created the token, you set an expiration time (expiresIn) in the token options. This expiration is embedded within the token's payload.
+
+    jwt.verify Process: When jwt.verify is called on the token, the library automatically checks the current time against the expiration time inside the token:
+    */
+    try {
+        const decodedToken = jwt.verify(
+            incomingRefrehToken,
+            process.env.ACCESS_TOKEN_SECRET
+        )
+        //Purpose: This check ensures that the user exists and has a legitimate record in the database, providing an additional security measure.
+        const user = await User.findById(decodedToken?._id);
+        if (!user) {
+            throw new ApiError(401, "Invalid Refreh Token")
+        }
+        //comparing refrehTokens 
+        if (incomingRefrehToken !== user?.refreshToken) {
+            throw new ApiError(401, "Refresh Token is expired or used")
+        }
+        //genererate new tokens
+        const { accessToken, refreshToken } = await generateAccessANDRefreshToken(user._id)
+
+        const options = {
+            httpOnly: true,
+            secure: true
+        }
+
+        return res.status(200)
+            .cookie("accessToken", accessToken, options)
+            .cookie("refreshToken", refreshToken, options)
+            .json(
+                new ApiResponse(
+                    200,
+                    { accessToken, refreshToken},
+                    "Access token refreshed"
+                )
+            )
+    } catch (error) {
+        throw new ApiError(401, error?.message || "Invalid RefreshToken")
+    }
+
+
+})
+
+export { registerUser, loginUser, logOutUser, refreshAccessToken }
+
 //Access and Refresh token and why in cookies
 /*
 nd also when we can send in json return why are we sending cokkies?
@@ -261,4 +332,3 @@ The server checks this access token to verify if the user is authenticated. If t
 */
 
 
-export { registerUser, loginUser,logOutUser}

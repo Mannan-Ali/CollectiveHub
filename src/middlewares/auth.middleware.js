@@ -1,4 +1,6 @@
-//this middleware only checks if user is there or not 
+//this middleware only checks if user is Logined or not
+//if yes then we can do specific opeation on on the specific user logedin
+
 import { asynHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js"
@@ -8,7 +10,6 @@ export const verifyJWT = asynHandler(async (req, res, next) => {
         //remeber the appbewery where we set  AUthencation for level4 as bearear token this req.header is same thing we are checking if someone sends using Authentication
         //Authorization : bearber token
         const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "")
-        console.log(token)
         if (!token) {
             throw new ApiError(401, "Unauthorized Request")
         }
