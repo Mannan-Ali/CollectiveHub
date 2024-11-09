@@ -157,7 +157,7 @@ const loginUser = asynHandler(async (req, res) => {
         throw new ApiError(404, "User does not exits in DataBase")
     }
     //comapre the passowrds provied to db passowrd
-    //already made ispasswordCorrect in User.Model.js
+    //already made isPasswordCorrect in User.Model.js
     //**NOTE : as me took instance inside userInDB so to access the methods that we created and is not universal  we use userInDB
     const ispasswordValid = await userInDB.isPasswordCorrect(password)
     if (!ispasswordValid) {
@@ -299,7 +299,65 @@ const refreshAccessToken = asynHandler(async (req, res) => {
 
 })
 
-export { registerUser, loginUser, logOutUser, refreshAccessToken }
+const changeCurrentPassowrd = asynHandler(async (req, res) => {
+    //the user will enter this 2 filed on the frontend 
+    //can also add confirm password
+    const { oldPassword, newPassword } = req.body;
+    // if(newPassword !== confPassword){
+    //     throw new ApiError...
+    // }
+    //to do this user should be loged in and that can be checked with auth middlware
+    //that is we can use here req.user
+    const user = await User.findById(req.user?._id)//finding user in database
+    if (!user) {
+        throw new ApiError(404, "User does not exits in DataBase")
+    }
+    //we can check if the old password is correct or not the same way we do for login
+    const checkOldPassword = await user.isPasswordCorrect(oldPassword)
+    if (!checkOldPassword) {
+        throw new ApiError(401, "Wrong Pasword Entered")
+    }
+    //this line will first call the pre so that the password is encrypted
+    user.password = newPassword;
+    await user.save({ validateBeforeSave: false })
+
+    return res.status(200)
+        .json(
+            new ApiResponse(200, {}, "Password is Updated !!")
+        )
+})
+
+//this function is mainly used for dashbord or profile to load them faster
+const getCurrentUser = asynHandler(async (req, res) => {
+    return res.status(200)
+        .json(200, req.user, "current user fetched successfully")
+})
+//to update user profile if he needs this is different from password as password usually have to be checked as it is sensitive 
+//for avatar we can write another method because here just for image changing everthing will we resend 
+const updateAccountDetails = asynHandler(async (req, res) => {
+    const { fullName, email } = req.body
+    if (!fullName || !email) {
+        throw new ApiError(400, "Both entities required !!!")
+    }
+
+    const user = await User.findByIdAndUpdate(
+        req.user?._id,
+        {
+            $set: {
+                fullName: fullName,
+                email: email,
+            },
+        },
+        { new: true },
+    ).select("-password") //we are directly applying select can also male selectedUser Like in 
+
+
+    return res.status(200)
+    .json(
+        new ApiResponse(200,user,"Account Details Updataed Successfully")
+    )
+})
+export { registerUser, loginUser, logOutUser, refreshAccessToken, changeCurrentPassowrd, getCurrentUser, updateAccountDetails }
 
 //Access and Refresh token and why in cookies
 /*
