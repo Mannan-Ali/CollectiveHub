@@ -75,7 +75,6 @@ const registerUser = asynHandler(async (req, res) => {
     //the avatar is the one declared with same name in routes user
     //avatar[0] bcoz we are returnd an arrya kind and we only need the url or path that is the 1st valeu
     const avatarLocalPath = req.files?.avatar[0]?.path;
-    console.log(path.normalize(avatarLocalPath))
     ///for cover image 
     // const coverImageLocalPath = req.files?.coverImage[0]?.path
     let coverImageLocalPath;
@@ -357,7 +356,60 @@ const updateAccountDetails = asynHandler(async (req, res) => {
         new ApiResponse(200,user,"Account Details Updataed Successfully")
     )
 })
-export { registerUser, loginUser, logOutUser, refreshAccessToken, changeCurrentPassowrd, getCurrentUser, updateAccountDetails }
+
+//to update files like photos , avatar 
+const updateUserAvatar = asynHandler(async(req,res)=>{
+    //we will use multer in routes so user can upload file
+    //here only file as only 1 value is taken in middleware that is avatar
+    const avatarFilePath = req.file?.path
+    if(!avatarFilePath){
+        throw new ApiError(400,"Avatar file is missgin")
+    }
+    const avatar = await uploadOnCloudinary(avatarFilePath);
+    if(!avatar.url){
+        throw new ApiError(400,"Error while Uploading File")
+    }
+    const user = await User.findByIdAndUpdate(
+        req.user?._id,
+        {
+            $set : {
+                avatar : avatar.url
+            }
+        },
+        { new : true}
+    ).select("-password")
+    return res.status(200)
+    .json(
+        new ApiResponse(200,user,"Avatar Updated Successfully")
+    )
+})
+
+const updateUserCoverImage = asynHandler(async(req,res)=>{
+    //we will use multer in routes so user can upload file
+    //here only file as only 1 value is taken in middleware that is avatar
+    const coverImageFilePath = req.file?.path
+    if(!coverImageFilePath){
+        throw new ApiError(400,"CoverImage file is missgin")
+    }
+    const coverImage = await uploadOnCloudinary(coverImageFilePath);
+    if(!coverImage.url){
+        throw new ApiError(400,"Error while Uploading File")
+    }
+    const user = await User.findByIdAndUpdate(
+        req.user?._id,
+        {
+            $set : {
+                coverImage : coverImage.url
+            }
+        },
+        { new : true}
+    ).select("-password")
+    return res.status(200)
+    .json(
+        new ApiResponse(200,user,"CoverImage Updated Successfully")
+    )
+})
+export { registerUser, loginUser, logOutUser, refreshAccessToken, changeCurrentPassowrd, getCurrentUser, updateAccountDetails,updateUserAvatar,updateUserCoverImage }
 
 //Access and Refresh token and why in cookies
 /*
