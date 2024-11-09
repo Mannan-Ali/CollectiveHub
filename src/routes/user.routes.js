@@ -3,7 +3,7 @@ Check user controller before this
 */
 
 import { Router } from "express";
-import { registerUser, loginUser, logOutUser,refreshAccessToken } from "../controllers/user.controller.js";
+import { registerUser, loginUser, logOutUser, refreshAccessToken, changeCurrentPassowrd, getCurrentUser, updateAccountDetails, updateUserAvatar, updateUserCoverImage } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 const router = Router()
@@ -24,6 +24,19 @@ router.route("/register").post(
 router.route("/LogIn").post(loginUser)
 router.route("/LogOut").post(verifyJWT, logOutUser)
 router.route("/RefreshAccessToken").post(refreshAccessToken)
+router.route("/ChangePassowrd").post(verifyJWT, changeCurrentPassowrd)
+router.route("/profile").get(verifyJWT, getCurrentUser)
+router.route("/UpdateDetails").patch(verifyJWT, updateAccountDetails)
+router.route("/avatar").patch(
+    verifyJWT,
+    upload.single("avatar")
+    , updateUserAvatar
+)
+router.route("/coverImage").patch(
+    verifyJWT,
+    upload.single("coverImage")
+    , updateUserCoverImage)
+
 //now we can access req.user in controller in logOut
 export { router }
 
