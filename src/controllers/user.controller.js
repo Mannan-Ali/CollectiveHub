@@ -9,6 +9,8 @@ import uploadOnCloudinary from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import path from "path";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
+import { lookup } from "dns";
 
 //creating method for access and refresh token which is used in loginUser
 //here we are not useing asyncHandler bcoz no web request is made it us for this file only
@@ -436,63 +438,63 @@ const getUserChannelProfile = asynHandler(async (req, res) => {
             //this is only for the data we get from match
             {
                 //total number of subscriber
-                $lookup:{
+                $lookup: {
                     //db converts name given to lower with s
-                    from :"subscriptions",
-                    localField : "_id", // what do we call it here 
-                    foreignField : "channel", //what do we call it in other file 
-                    as : "subscribers"
+                    from: "subscriptions",
+                    localField: "_id", // what do we call it here 
+                    foreignField: "channel", //what do we call it in other file 
+                    as: "subscribers"
                 }
             },
             {
                 //total channels i have subscribed
-                $lookup:{
-                    from :"subscriptions",
-                    localField : "_id", // what do we call it here 
-                    foreignField : "subscriber", //what do we call it in other file 
-                    as : "subscribedTo"
+                $lookup: {
+                    from: "subscriptions",
+                    localField: "_id", // what do we call it here 
+                    foreignField: "subscriber", //what do we call it in other file 
+                    as: "subscribedTo"
                 }
                 //both filed can have id as in model we have referenced both from user that is both filed are made from this fileds id ,so we can uniquely identify them
             },
             {
                 //we are making this filed because we want to return single object(each value in array will be object) here there are 2 lookup we will make it one 
-                $addFields:{
-                    subscribersCount : {
-                        $size:"$subscribers"
+                $addFields: {
+                    subscribersCount: {
+                        $size: "$subscribers"
                     },
-                    channelSubscribedToCount:{
-                        $size:"$subscribedTo"
+                    channelSubscribedToCount: {
+                        $size: "$subscribedTo"
                     },
-                    isSubscribed:{
+                    isSubscribed: {
                         //here we are checking if we are subscribed to that channel
                         //how we are doing that is cheing if the user_id (as we are loged in) is there in the subscriber filed as a subscriber
-                        $cond:{
+                        $cond: {
                             //in can check for both array and object
-                            if:{$in:[req.user?._id,"$subscribers.subscriber"]},
-                            then:true,
-                            else:false,
+                            if: { $in: [req.user?._id, "$subscribers.subscriber"] },
+                            then: true,
+                            else: false,
                         }
                     }
                 }
             },
             {
                 //this filed is for projecting selected values like what you want to send from all the data of user to the sighned in user ,like you wont send email and stuff of the channel user
-                $project:{
-                    fullName:1,
-                    username:1,
-                    subscribersCount:1,
-                    channelSubscribedToCount:1,
-                    isSubscribed:1,
-                    avatar:1,
-                    coverImage:1
+                $project: {
+                    fullName: 1,
+                    username: 1,
+                    subscribersCount: 1,
+                    channelSubscribedToCount: 1,
+                    isSubscribed: 1,
+                    avatar: 1,
+                    coverImage: 1
                 }
             }
 
         ]
     )
     //if channel is empty th
-    if(!channel?.length){
-        throw new ApiError(400,"Channel does not exist")
+    if (!channel?.length) {
+        throw new ApiError(400, "Channel does not exist")
     }
     /*
     Why to lowercase is used
@@ -503,13 +505,90 @@ const getUserChannelProfile = asynHandler(async (req, res) => {
 
     //we are only returning one value of channel but it has many only 1 is returned for frontend develpor to see the names and values so he can just apply then 
     //makes it easy for frontend user can also return full channel
-   return res.status(200)
-   .json(
-    new ApiResponse(200,channel[0],"User Channel fetched Successfully!!")
-   )
+    return res.status(200)
+        .json(
+            new ApiResponse(200, channel[0], "User Channel fetched Successfully!!")
+        )
 })
 
-export { registerUser, loginUser, logOutUser, refreshAccessToken, changeCurrentPassowrd, getCurrentUser, updateAccountDetails, updateUserAvatar, updateUserCoverImage }
+const getWatchHistory = asynHandler(async (req, res) => {
+    const user = await User.aggregate(
+        [
+            {
+                $match: {
+                    //why this as till now we were getting ids string value that was in _id Object 
+                    //mongoose was use to convert it to objectId but here it wont happen then so we create mongoose id here
+                    _id: new mongoose.Schema.Types.ObjectId(req.user._id)
+                }
+            },
+            {
+                $lookup: {
+                    from: "vidoes",
+                    localField: "watchHistory",
+                    foreignField: "_id",
+                    as: "watchHistory",
+                    /*
+                    Imagine you have two lists:
+
+                    One list called users, which has people's information like their name and the IDs of videos they've watched.
+                    Another list called videos, which has information about each video, like who made it and its title.
+                    What We Want to Do:
+                    We want to find all the videos a specific user has watched, and for each of those videos, we also want to know more about who made it (the creator).
+
+                    How It Works:
+                    First $lookup: We look at the users list and find the user we're interested in. We use their watchHistory to find matching videos in the videos list. This tells us,
+                    “Here are the videos this person watched.”
+
+                    Nested $lookup: For each video we find, we do another lookup to find out who made it by checking the owner field in the videos list. 
+                    This matches the owner with an _id in the users list so we can include information like the creator's name or profile.
+                    */
+                    pipeline: [
+                        {
+                            $lookup: {
+                                from: "users",
+                                localField: "owner",
+                                foreignField: "_id",
+                                as: "owner",
+                                //now this pipeline is for we get lot of values from owners side which one do we want to show to user 
+                                pipeline:[
+                                    {
+                                        $project:{
+                                            fullName:1,
+                                            username:1,
+                                            avatar:1,
+                                            coverImage:1,
+                                        }
+                                    }
+                                ]
+                            }
+
+                        },
+                        {
+                            $addFields:{
+                                //here we will overwrite owner 
+                                owner:{
+                                    $first:"$owner"
+                                }
+                            }
+                        }
+                    ]
+
+                }
+            }
+        ]
+    )
+    res.status(200)
+    .json(
+        new ApiResponse(200,user[0].watchHistory,"Watch History Fetched Successfully")
+    )
+})
+export {
+    registerUser, loginUser, logOutUser,
+    refreshAccessToken, changeCurrentPassowrd,
+    getCurrentUser, updateAccountDetails,
+    updateUserAvatar, updateUserCoverImage
+    , getUserChannelProfile,getWatchHistory
+}
 
 //Access and Refresh token and why in cookies
 /*
