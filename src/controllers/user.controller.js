@@ -329,7 +329,9 @@ const changeCurrentPassowrd = asynHandler(async (req, res) => {
 //this function is mainly used for dashbord or profile to load them faster
 const getCurrentUser = asynHandler(async (req, res) => {
     return res.status(200)
-        .json(200, req.user, "current user fetched successfully")
+        .json(
+            new ApiResponse(200, req.user, "current user fetched successfully")
+        )
 })
 //to update user profile if he needs this is different from password as password usually have to be checked as it is sensitive 
 //for avatar we can write another method because here just for image changing everthing will we resend 
@@ -352,65 +354,65 @@ const updateAccountDetails = asynHandler(async (req, res) => {
 
 
     return res.status(200)
-    .json(
-        new ApiResponse(200,user,"Account Details Updataed Successfully")
-    )
+        .json(
+            new ApiResponse(200, user, "Account Details Updataed Successfully")
+        )
 })
 
 //to update files like photos , avatar 
-const updateUserAvatar = asynHandler(async(req,res)=>{
+const updateUserAvatar = asynHandler(async (req, res) => {
     //we will use multer in routes so user can upload file
     //here only file as only 1 value is taken in middleware that is avatar
     const avatarFilePath = req.file?.path
-    if(!avatarFilePath){
-        throw new ApiError(400,"Avatar file is missgin")
+    if (!avatarFilePath) {
+        throw new ApiError(400, "Avatar file is missgin")
     }
     const avatar = await uploadOnCloudinary(avatarFilePath);
-    if(!avatar.url){
-        throw new ApiError(400,"Error while Uploading File")
+    if (!avatar.url) {
+        throw new ApiError(400, "Error while Uploading File")
     }
     const user = await User.findByIdAndUpdate(
         req.user?._id,
         {
-            $set : {
-                avatar : avatar.url
+            $set: {
+                avatar: avatar.url
             }
         },
-        { new : true}
+        { new: true }
     ).select("-password")
     return res.status(200)
-    .json(
-        new ApiResponse(200,user,"Avatar Updated Successfully")
-    )
+        .json(
+            new ApiResponse(200, user, "Avatar Updated Successfully")
+        )
 })
 
-const updateUserCoverImage = asynHandler(async(req,res)=>{
+const updateUserCoverImage = asynHandler(async (req, res) => {
     //we will use multer in routes so user can upload file
     //here only file as only 1 value is taken in middleware that is avatar
     const coverImageFilePath = req.file?.path
-    if(!coverImageFilePath){
-        throw new ApiError(400,"CoverImage file is missgin")
+    if (!coverImageFilePath) {
+        throw new ApiError(400, "CoverImage file is missgin")
     }
     const coverImage = await uploadOnCloudinary(coverImageFilePath);
-    if(!coverImage.url){
-        throw new ApiError(400,"Error while Uploading File")
+    if (!coverImage.url) {
+        throw new ApiError(400, "Error while Uploading File")
     }
     const user = await User.findByIdAndUpdate(
         req.user?._id,
         {
-            $set : {
-                coverImage : coverImage.url
+            $set: {
+                coverImage: coverImage.url
             }
         },
-        { new : true}
+        { new: true }
     ).select("-password")
-    
+
     return res.status(200)
-    .json(
-        new ApiResponse(200,user,"CoverImage Updated Successfully")
-    )
+        .json(
+            new ApiResponse(200, user, "CoverImage Updated Successfully")
+        )
 })
-export { registerUser, loginUser, logOutUser, refreshAccessToken, changeCurrentPassowrd, getCurrentUser, updateAccountDetails,updateUserAvatar,updateUserCoverImage }
+export { registerUser, loginUser, logOutUser, refreshAccessToken, changeCurrentPassowrd, getCurrentUser, updateAccountDetails, updateUserAvatar, updateUserCoverImage }
 
 //Access and Refresh token and why in cookies
 /*
