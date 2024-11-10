@@ -424,7 +424,7 @@ const getUserChannelProfile = asynHandler(async (req, res) => {
     if (!username?.trim()) {//trim is for if there is nothing like it is empty space only then it will turn it into empty string 
         throw new ApiError(400, "Username is not correct!!")
     }
-
+    console.log(username)
     // User.find(username) to refine it more we will directly apply aggregation bcoz we can use match directly there
     //we get array in return from aggregate the array can also contain objedt
     //here User all fields like username,fullname,etc are already found 
@@ -432,7 +432,7 @@ const getUserChannelProfile = asynHandler(async (req, res) => {
         [
             {
                 $match: {
-                    username: username?.toLowerCase()
+                    userName: username?.toLowerCase()
                 }
             },
             //this is only for the data we get from match
@@ -492,6 +492,7 @@ const getUserChannelProfile = asynHandler(async (req, res) => {
 
         ]
     )
+    console.log(channel)
     //if channel is empty th
     if (!channel?.length) {
         throw new ApiError(400, "Channel does not exist")
@@ -518,7 +519,7 @@ const getWatchHistory = asynHandler(async (req, res) => {
                 $match: {
                     //why this as till now we were getting ids string value that was in _id Object 
                     //mongoose was use to convert it to objectId but here it wont happen then so we create mongoose id here
-                    _id: new mongoose.Schema.Types.ObjectId(req.user._id)
+                    _id:  new mongoose.Types.ObjectId(req.user._id)
                 }
             },
             {
