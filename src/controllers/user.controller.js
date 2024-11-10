@@ -74,6 +74,7 @@ const registerUser = asynHandler(async (req, res) => {
     //req.files these files we get bcoz of multer its not from express 
     //the avatar is the one declared with same name in routes user
     //avatar[0] bcoz we are returnd an arrya kind and we only need the url or path that is the 1st valeu
+
     const avatarLocalPath = req.files?.avatar[0]?.path;
     ///for cover image 
     // const coverImageLocalPath = req.files?.coverImage[0]?.path
@@ -412,6 +413,102 @@ const updateUserCoverImage = asynHandler(async (req, res) => {
             new ApiResponse(200, user, "CoverImage Updated Successfully")
         )
 })
+
+const getUserChannelProfile = asynHandler(async (req, res) => {
+    //we are gtting username from url as when we go to a channel it has it name in the link
+    const { username } = req.params
+    //does this username exits or not 
+    // alidation of Empty Strings: If username only contains spaces (e.g., " "), trim() will turn it into an empty string (""). This makes the check more robust by ensuring that a string containing only spaces is treated as an invalid username.
+    if (!username?.trim()) {//trim is for if there is nothing like it is empty space only then it will turn it into empty string 
+        throw new ApiError(400, "Username is not correct!!")
+    }
+
+    // User.find(username) to refine it more we will directly apply aggregation bcoz we can use match directly there
+    //we get array in return from aggregate the array can also contain objedt
+    //here User all fields like username,fullname,etc are already found 
+    const channel = await User.aggregate(
+        [
+            {
+                $match: {
+                    username: username?.toLowerCase()
+                }
+            },
+            //this is only for the data we get from match
+            {
+                //total number of subscriber
+                $lookup:{
+                    //db converts name given to lower with s
+                    from :"subscriptions",
+                    localField : "_id", // what do we call it here 
+                    foreignField : "channel", //what do we call it in other file 
+                    as : "subscribers"
+                }
+            },
+            {
+                //total channels i have subscribed
+                $lookup:{
+                    from :"subscriptions",
+                    localField : "_id", // what do we call it here 
+                    foreignField : "subscriber", //what do we call it in other file 
+                    as : "subscribedTo"
+                }
+                //both filed can have id as in model we have referenced both from user that is both filed are made from this fileds id ,so we can uniquely identify them
+            },
+            {
+                //we are making this filed because we want to return single object(each value in array will be object) here there are 2 lookup we will make it one 
+                $addFields:{
+                    subscribersCount : {
+                        $size:"$subscribers"
+                    },
+                    channelSubscribedToCount:{
+                        $size:"$subscribedTo"
+                    },
+                    isSubscribed:{
+                        //here we are checking if we are subscribed to that channel
+                        //how we are doing that is cheing if the user_id (as we are loged in) is there in the subscriber filed as a subscriber
+                        $cond:{
+                            //in can check for both array and object
+                            if:{$in:[req.user?._id,"$subscribers.subscriber"]},
+                            then:true,
+                            else:false,
+                        }
+                    }
+                }
+            },
+            {
+                //this filed is for projecting selected values like what you want to send from all the data of user to the sighned in user ,like you wont send email and stuff of the channel user
+                $project:{
+                    fullName:1,
+                    username:1,
+                    subscribersCount:1,
+                    channelSubscribedToCount:1,
+                    isSubscribed:1,
+                    avatar:1,
+                    coverImage:1
+                }
+            }
+
+        ]
+    )
+    //if channel is empty th
+    if(!channel?.length){
+        throw new ApiError(400,"Channel does not exist")
+    }
+    /*
+    Why to lowercase is used
+    Converting to lowercase is important to ensure case-insensitive matching when querying the database. Here's why this matters:
+    Consistency in Matching: Databases, by default, can be case-sensitive, meaning "JohnDoe" and "johndoe" would be treated as different values. 
+    Converting the input to lowercase ensures that a username match works regardless of capitalization. This way, if a user searches for johndoe but the stored username is JohnDoe, the query will still find it.
+    */
+
+    //we are only returning one value of channel but it has many only 1 is returned for frontend develpor to see the names and values so he can just apply then 
+    //makes it easy for frontend user can also return full channel
+   return res.status(200)
+   .json(
+    new ApiResponse(200,channel[0],"User Channel fetched Successfully!!")
+   )
+})
+
 export { registerUser, loginUser, logOutUser, refreshAccessToken, changeCurrentPassowrd, getCurrentUser, updateAccountDetails, updateUserAvatar, updateUserCoverImage }
 
 //Access and Refresh token and why in cookies
