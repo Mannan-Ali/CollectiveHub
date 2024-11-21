@@ -41,6 +41,8 @@ const videoSchema = new mongoose.Schema(
     },
     { timestamps: true }
 )
+//this is for as we cannot show all the viodes to user at once it has to load  :
+//it gives from where till where the videos should be given
 //we can only use Mongooseaggreagate with plugin
 videoSchema.plugin(mongooseAggregatePaginate)
 
