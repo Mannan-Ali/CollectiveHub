@@ -249,15 +249,10 @@ const refreshAccessToken = asynHandler(async (req, res) => {
 
 
     Correct, the verification part in this code does not directly involve the database. Here’s how it works:
-
     Verification Process: When you use jwt.verify, you’re verifying the token’s structure, signature, and expiration status based solely on the token itself and the secret key (ACCESS_TOKEN_SECRET). This step ensures:
-
     The token was issued by your server (because it was signed with your secret).
-
     The token validity (whether it's expired or not) is determined during the jwt.verify process. Here’s how that works:
-
     Expiration Check: When you created the token, you set an expiration time (expiresIn) in the token options. This expiration is embedded within the token's payload.
-
     jwt.verify Process: When jwt.verify is called on the token, the library automatically checks the current time against the expiration time inside the token:
     */
     try {
