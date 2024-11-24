@@ -56,7 +56,15 @@ const publishAVideo = asynHandler(async (req, res) => {
 
 const getVideoById = asynHandler(async (req, res) => {
     const { videoId } = req.params
+    if(!videoId){
+        return new ApiError(400,"Need videoId!!")
+    }
     //TODO: get video by id
+    const video = await Video.findById(videoId);
+    return res.status(200)
+        .json(
+            new ApiResponse(200, video, "Follwing vidoe data was fetched")
+        )
 })
 
 const updateVideo = asynHandler(async (req, res) => {
