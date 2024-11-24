@@ -26,9 +26,28 @@ const uploadOnCloudinary = async (localFilePath) => {
     }
 }
 
+const deleteFromCloudinary = async (cloudinaryFilepath) => {
+    try {
+      if (!cloudinaryFilepath) return null;
+      /*
+    cloudinaryFilepath.split("/"): Splits the Cloudinary file path into an array of segments using / as the delimiter. For example, if the cloudinaryFilepath is "https://res.cloudinary.com/demo/image/upload/v1600451234/myImage.jpg", this will give you an array like ["https:", "", "res.cloudinary.com", "demo", "image", "upload", "v1600451234", "myImage.jpg"].
+    .pop(): Retrieves the last element of this array. In the example above, it would return "myImage.jpg".
 
+    .split(".")[0]: Splits the file name at the period (".") and takes the first part (the file name without the extension). So for "myImage.jpg", this would return "myImage".
 
-export default uploadOnCloudinary;
+    This is done to extract the public ID of the file stored on Cloudinary, which is what is needed to delete the file. The public ID is the part of the Cloudinary URL that uniquely identifies the file.
+      */
+      const fileName = cloudinaryFilepath.split("/").pop().split(".")[0];
+      //we need public id part as destory function only takes that
+      const response = await cloudinary.uploader.destroy(fileName);
+      return response;
+    } catch (error) {
+      console.log("Error while deleting file from cloudinary : ", error);
+      return null;
+    }
+  };
+
+export {uploadOnCloudinary,deleteFromCloudinary};
 
 
 

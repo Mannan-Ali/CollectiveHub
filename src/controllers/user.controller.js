@@ -5,7 +5,7 @@ as we dont have frontend we will be using postman
 import { asynHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js"
-import uploadOnCloudinary from "../utils/cloudinary.js"
+import {uploadOnCloudinary,deleteFromCloudinary }from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import path from "path";
 import jwt from "jsonwebtoken";
@@ -57,8 +57,7 @@ const registerUser = asynHandler(async (req, res) => {
     //better approach other than doing all ifs
     //some returns boolen value read on google
     if (
-        [userName, fullName, email, password].some((field) =>
-            field?.trim() === "")
+        [userName, fullName, email, password].some((field) => field?.trim() === "")
     ) {
         throw new ApiError(400, "You missed some filed please fill them !!!")
     }
@@ -101,10 +100,10 @@ const registerUser = asynHandler(async (req, res) => {
     }
     const user = await User.create(
         {
+            userName: userName.toLowerCase(),
             //check cloudinary.js for response.url and type 
             avatar: avatar.url,
             coverImage: coverImage?.url || "", //here what we are doing is checking if url not exits then let it be empty
-            userName: userName.toLowerCase(),
             fullName,
             email,
             password,
@@ -369,6 +368,8 @@ const updateUserAvatar = asynHandler(async (req, res) => {
     if (!avatar.url) {
         throw new ApiError(400, "Error while Uploading File")
     }
+    const oldAvatar = req.user?.avatar
+    console.log(oldAvatar)
     const user = await User.findByIdAndUpdate(
         req.user?._id,
         {
@@ -378,6 +379,8 @@ const updateUserAvatar = asynHandler(async (req, res) => {
         },
         { new: true }
     ).select("-password")
+    //calling the deleteCloudinary Function to delete the 
+    await deleteFromCloudinary(oldAvatar)
     return res.status(200)
         .json(
             new ApiResponse(200, user, "Avatar Updated Successfully")
@@ -395,6 +398,8 @@ const updateUserCoverImage = asynHandler(async (req, res) => {
     if (!coverImage.url) {
         throw new ApiError(400, "Error while Uploading File")
     }
+    const oldCoverImage = req.user?.avatar
+    console.log(oldCoverImage)
     const user = await User.findByIdAndUpdate(
         req.user?._id,
         {
@@ -404,7 +409,7 @@ const updateUserCoverImage = asynHandler(async (req, res) => {
         },
         { new: true }
     ).select("-password")
-
+    await deleteFromCloudinary(oldCoverImage)
     return res.status(200)
         .json(
             new ApiResponse(200, user, "CoverImage Updated Successfully")
