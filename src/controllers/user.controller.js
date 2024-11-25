@@ -162,7 +162,7 @@ const loginUser = asynHandler(async (req, res) => {
     //**NOTE : as me took instance inside userInDB so to access the methods that we created and is not universal  we use userInDB
     const ispasswordValid = await userInDB.isPasswordCorrect(password)
     if (!ispasswordValid) {
-        throw new ApiError(401, "User does not exits in DataBase")
+        throw new ApiError(401, "Enter valid or correct passoword")
     }
 
     //if passoword is correct generate access token and refresh token 

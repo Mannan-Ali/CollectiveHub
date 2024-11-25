@@ -37,9 +37,11 @@ const deleteFromCloudinary = async (cloudinaryFilepath) => {
 
     This is done to extract the public ID of the file stored on Cloudinary, which is what is needed to delete the file. The public ID is the part of the Cloudinary URL that uniquely identifies the file.
       */
+    const resourceType = cloudinaryFilepath.includes("video") ? "video" : "image";
       const fileName = cloudinaryFilepath.split("/").pop().split(".")[0];
+      console.log(fileName)
       //we need public id part as destory function only takes that
-      const response = await cloudinary.uploader.destroy(fileName);
+      const response = await cloudinary.uploader.destroy(fileName,{resource_type:resourceType});
       return response;
     } catch (error) {
       console.log("Error while deleting file from cloudinary : ", error);
