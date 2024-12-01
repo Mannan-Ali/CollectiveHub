@@ -5,7 +5,7 @@ const app = express();
 
 //to interact with middleware like bodyparser we use app.use 
 //even cors is used this way
-
+//cors is used to specify which url request to allow
 app.use(cors({
     //which which origins we are allowing it to access data from our server
     origin: process.env.CORS_ORIGIN,

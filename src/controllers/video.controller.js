@@ -129,7 +129,7 @@ const deleteVideo = asynHandler(async (req, res) => {
     }
     const video = await Video.findById(videoId);
     if (!video) {
-        throw new ApiError(500, "Error in deleting the object!!")
+        throw new ApiError(400, "No such Video exists!!")
     }
     if (req.user._id.toString() !== video.owner.toString()) {
         throw new ApiError(403, "You Not Owner of this video")
@@ -137,8 +137,6 @@ const deleteVideo = asynHandler(async (req, res) => {
 
     //TODO: delete video
     const deleteOldVideo = await deleteFromCloudinary(video.videoFile);
-    console.log(deleteOldVideo)
-    console.log(video.videoFile)
     if (deleteOldVideo.result !== "ok") {
         throw new ApiError(
             500,
@@ -146,7 +144,7 @@ const deleteVideo = asynHandler(async (req, res) => {
         );
     }
     const deleteOldThumbnail = await deleteFromCloudinary(video.thumbnail);
-    if(deleteOldThumbnail.result !=="ok"){
+    if (deleteOldThumbnail.result !== "ok") {
         throw new ApiError(
             500,
             "Error while deleting old video from cloudinary"
@@ -165,6 +163,33 @@ const deleteVideo = asynHandler(async (req, res) => {
 
 const togglePublishStatus = asynHandler(async (req, res) => {
     const { videoId } = req.params
+    if (!isValidObjectId(videoId)) {
+        throw new ApiError(400, "Invalid Video Id")
+    }
+    const video = await Video.findById(videoId)
+    if (!video) {
+        throw new ApiError(400, "No such video exists")
+    }
+    if (req.user._id.toString() !== video.owner.toString()) {
+        throw new ApiError(403, "You Not Owner of this video")
+    }
+    try {
+        video.isPublished = !video.isPublished
+        await video.save({ validateBeforeSave: false })
+    } catch (error) {
+        throw new ApiError(500,"Something went wrong while updating isPublish")
+    }
+    // const updatetogglePublish = await Video.findByIdAndUpdate(
+    //     videoId,
+    //     {
+    //         $set: {
+    //             isPublished : !video.isPublished
+    //         },
+    //     },
+    //     { new: true },
+    // )
+    return res.status(200)
+    .json( new ApiResponse(200,video,`Publishing was successfully set to ${video.isPublished}`))
 })
 
 export {
