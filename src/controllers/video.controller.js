@@ -27,10 +27,10 @@ const getAllVideos = asynHandler(async (req, res) => {
     const totalVideos = await Video.countDocuments({
         $or: [
             {
-                title: { $regex: query, options: "i" },
+                title: { $regex: query, $options: "i" },
             },
             {
-                description: { $regex: query, options: "i" }
+                description: { $regex: query, $options: "i" }
             }
         ]
     })
@@ -50,10 +50,10 @@ const getAllVideos = asynHandler(async (req, res) => {
                     //or because we want to check accorss all the fields in the model for matching query 
                     $or: [
                         {
-                            title: { $regex: query, options: "i" },
+                            title: { $regex: query, $options: "i" },
                         },
                         {
-                            description: { $regex: query, options: "i" }
+                            description: { $regex: query, $options: "i" }
                         }
                     ]
                 }
