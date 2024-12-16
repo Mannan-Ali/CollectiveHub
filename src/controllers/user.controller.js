@@ -521,7 +521,7 @@ const getWatchHistory = asynHandler(async (req, res) => {
                     //you cannot directly use a method like User.findById(userId) because aggregation is meant to work with MongoDB operators and expressions hence outiside it works but not inside here
                     //why this as till now we were getting ids string value that was in _id Object 
                     //mongoose was use to convert it to objectId but here it wont happen then so we create mongoose id here
-                    _id:  new mongoose.Types.ObjectId(req.user._id)
+                    _id:  new mongoose.Types.ObjectId.createFromHexString(req.user._id)
                 }
             },
             {
