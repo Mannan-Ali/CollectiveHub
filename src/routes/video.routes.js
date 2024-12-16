@@ -1,9 +1,10 @@
 import { Router } from "express";
 import { upload } from "../middlewares/multer.middleware.js";
-import { deleteVideo, getVideoById, publishAVideo, updateVideo } from "../controllers/video.controller.js";
+import { getAllVideos,deleteVideo, getVideoById, publishAVideo, updateVideo } from "../controllers/video.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 const router = Router()
 //when the user will come here using .../user then guide them to register if typed next it can be anything else also 
+router.route("/").get(verifyJWT,getAllVideos)
 router.route("/uploadVideos").post(
     verifyJWT,
     upload.fields([
@@ -19,4 +20,5 @@ router.route("/:videoId").patch(
     upload.single("thumbnail"),
     updateVideo)
 router.route("/:videoId").delete(verifyJWT,deleteVideo)
+
 export default router;

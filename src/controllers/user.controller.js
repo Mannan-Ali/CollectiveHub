@@ -420,7 +420,7 @@ const getUserChannelProfile = asynHandler(async (req, res) => {
     //we are gtting username from url as when we go to a channel it has it name in the link
     const { username } = req.params
     //does this username exits or not 
-    // alidation of Empty Strings: If username only contains spaces (e.g., " "), trim() will turn it into an empty string (""). This makes the check more robust by ensuring that a string containing only spaces is treated as an invalid username.
+    // validation of Empty Strings: If username only contains spaces (e.g., " "), trim() will turn it into an empty string (""). This makes the check more robust by ensuring that a string containing only spaces is treated as an invalid username.
     if (!username?.trim()) {//trim is for if there is nothing like it is empty space only then it will turn it into empty string 
         throw new ApiError(400, "Username is not correct!!")
     }
@@ -436,6 +436,7 @@ const getUserChannelProfile = asynHandler(async (req, res) => {
                 }
             },
             //this is only for the data we get from match
+            //output of data is used by next stage as input
             {
                 //total number of subscriber
                 $lookup: {
@@ -517,6 +518,7 @@ const getWatchHistory = asynHandler(async (req, res) => {
         [
             {
                 $match: {
+                    //you cannot directly use a method like User.findById(userId) because aggregation is meant to work with MongoDB operators and expressions hence outiside it works but not inside here
                     //why this as till now we were getting ids string value that was in _id Object 
                     //mongoose was use to convert it to objectId but here it wont happen then so we create mongoose id here
                     _id:  new mongoose.Types.ObjectId(req.user._id)

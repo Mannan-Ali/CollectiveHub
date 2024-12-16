@@ -8,8 +8,99 @@ import { uploadOnCloudinary, deleteFromCloudinary } from "../utils/cloudinary.js
 
 
 const getAllVideos = asynHandler(async (req, res) => {
-    const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
+    const { page = 1, limit = 10, query=" ", sortBy = "title", sortType = "asc", userId } = req.query
     //TODO: get all videos based on query, sort, pagination
+
+    /*steps:
+    1. finding values with matching query 
+    2.returning new doc with mmore info like vidoeFile,userName,fullName,etc.
+    3.sorting the vidoes based on sorts
+    4.pagination
+    */
+    const validatedPage = Number.isInteger(parseInt(page)) && parseInt(page) > 0 ? parseInt(page) : 1;
+    const validatedLimit = Number.isInteger(parseInt(limit)) && parseInt(limit) > 0 ? parseInt(limit) : 10;
+
+    // Calculate skip and limit values
+    const skipValue = (validatedPage - 1) * validatedLimit;
+    const limitValue = validatedLimit;
+
+    const totalVideos = await Video.countDocuments({
+        $or: [
+            {
+                title: { $regex: query, options: "i" },
+            },
+            {
+                description: { $regex: query, options: "i" }
+            }
+        ]
+    })
+
+    if (skipValue >= totalVideos) {
+        throw new ApiError(400, "Page Not found ")
+    }
+    const video = await Video.aggregate(
+        [
+            {
+                //to find the vidoes with the searched query we first use match here
+                $match: {
+                    owner: mongoose.Types.ObjectId.isValid(userId)//as we are using createFromHexString we have to check first if the userId is valied 24 char hex if not then go to exits
+                        ? mongoose.Types.ObjectId.createFromHexString(userId)  // If userId is provided, match specific owner
+                        : { $exists: true },//if no userId is provided, we are looking for all documents where the owner field exists, regardless of the value of owner.
+
+                    //or because we want to check accorss all the fields in the model for matching query 
+                    $or: [
+                        {
+                            title: { $regex: query, options: "i" },
+                        },
+                        {
+                            description: { $regex: query, options: "i" }
+                        }
+                    ]
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",//mongodb stores in small + s
+                    localField: "owner",
+                    foreignField: "_id",
+                    as: "Owner",
+                }
+            },
+            {
+                $unwind: "$Owner",//the owner file comes in array form so here we are unwinding it 
+            },
+            {
+                //what values we will need from the document
+                $project: {
+                    Owner: {
+                        userName: 1,
+                        fullName: 1,
+                        coverImage: 1,
+                    },
+                    videoFile: 1,
+                    thumbnail: 1,
+                    title: 1,
+                    description: 1,
+                    views: 1,
+                    duration: 1,
+                }
+            },
+            {
+                $sort: {
+                    [sortBy]: sortType === "asc" ? 1 : -1,
+                }
+            },
+            {
+                $skip: skipValue,
+            },
+            {
+                $limit: limitValue,
+            }
+        ]
+    )
+
+    return res.status(200)
+    .json(new ApiResponse(200,video,"Vidoes successfully fetched"))
 })
 
 const publishAVideo = asynHandler(async (req, res) => {
@@ -177,7 +268,7 @@ const togglePublishStatus = asynHandler(async (req, res) => {
         video.isPublished = !video.isPublished
         await video.save({ validateBeforeSave: false })
     } catch (error) {
-        throw new ApiError(500,"Something went wrong while updating isPublish")
+        throw new ApiError(500, "Something went wrong while updating isPublish")
     }
     // const updatetogglePublish = await Video.findByIdAndUpdate(
     //     videoId,
@@ -189,7 +280,7 @@ const togglePublishStatus = asynHandler(async (req, res) => {
     //     { new: true },
     // )
     return res.status(200)
-    .json( new ApiResponse(200,video,`Publishing was successfully set to ${video.isPublished}`))
+        .json(new ApiResponse(200, video, `Publishing was successfully set to ${video.isPublished}`))
 })
 
 export {
@@ -200,3 +291,50 @@ export {
     deleteVideo,
     togglePublishStatus
 }
+
+
+
+/*
+req.params
+Definition: Contains route parameters defined in the URL path of the route.
+
+Purpose: Typically used for dynamic segments in the URL path to identify specific resources.
+
+Access: Retrieved from the URL path, as defined in your route handler.
+
+Example:
+
+javascript
+Copy code
+app.get('/videos/:videoId', (req, res) => {
+    console.log(req.params.videoId);
+});
+URL: http://example.com/videos/123
+req.params: { videoId: '123' }
+Use Case:
+
+Retrieving a specific resource, like a video with a given videoId.
+
+NOTE: req query is send after part of ? using key value in params in postman
+req.query
+Definition: Contains the query string parameters appended to the URL after the ?.
+
+Purpose: Used for passing additional information to the server, like filters, sorting, or pagination details.
+
+Access: Retrieved from the query string of the URL.
+
+Example:
+
+javascript
+Copy code
+app.get('/videos', (req, res) => {
+    console.log(req.query.page); 
+    console.log(req.query.limit);
+});
+URL: http://example.com/videos?page=1&limit=10
+req.query: { page: '1', limit: '10' }
+Use Case:
+
+Filtering resources, like searching for videos with specific attributes, or defining options like page size for pagination.
+
+*/
