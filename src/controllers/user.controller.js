@@ -7,10 +7,10 @@ import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js"
 import {uploadOnCloudinary,deleteFromCloudinary }from "../utils/cloudinary.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
-import path from "path";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
-import { lookup } from "dns";
+// import { lookup } from "dns";
+// import path from "path";
 
 //creating method for access and refresh token which is used in loginUser
 //here we are not useing asyncHandler bcoz no web request is made it us for this file only
