@@ -10,7 +10,6 @@ import { app } from "./app.js"
 connectDB()
     .then(() => {
         app.listen(process.env.PORT, () => {
-            console.log(`http://localhost:${process.env.PORT}`);
         })
         //here we will use on listner to check specifficly that is the express able to talk to databse
         app.on("error", (error) => {
