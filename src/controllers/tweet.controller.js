@@ -73,7 +73,28 @@ const updateTweet = asynHandler(async (req, res) => {
 })
 
 const deleteTweet = asynHandler(async (req, res) => {
+    
+    const { tweetId } = req.params
+    console.log(tweetId);
+    
+    if (!isValidObjectId(tweetId)) {
+        throw new ApiError(404, "Enter valid tweet Id")
+    }
+    const tweet = await Tweet.findById(tweetId);
 
+    if (!tweet) {
+        throw new ApiError(404, "No such Tweet exits!!")
+    }
+    if (req.user._id.toString() !== tweet?.owner.toString()) {
+        throw new ApiError(403, "You Not Owner of this tweet")
+    }
+    try{
+        await Tweet.findByIdAndDelete(tweetId);
+    }catch (error) {
+        throw new ApiError(500, "Something went wrong while deleting tweet")
+    }
+    return res.status(200)
+        .json(new ApiResponse(200, "Tweet Deleted Successfully"))
 })
 
 
