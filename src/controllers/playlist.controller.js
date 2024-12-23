@@ -72,16 +72,85 @@ const getUserPlaylists = asynHandler(async (req, res) => {
 // to display all specific playlists. 
 const getPlaylistById = asynHandler(async (req, res) => {
     const { playlistId } = req.params
+    if (!isValidObjectId(playlistId)) {
+        throw new ApiError(400, "playlistId is not valid");
+    }
 
 })
 
 const addVideoToPlaylist = asynHandler(async (req, res) => {
     const { playlistId, videoId } = req.params
+    if (!isValidObjectId(playlistId) || !isValidObjectId(videoId)) {
+        throw new ApiError(400, "playlistId or videoId is not valid");
+    }
+
+    // const playlist = await PlayList.findById(playlistId);
+    // if (!playlist) {
+    //     throw new ApiError(400, "No such playlist exits");
+    // }
+    // if (req.user._id.toString() !== playlist.owner.toString()) {
+    //     throw new ApiError(403, "You cannot modify others playlist")
+    // }
+    //better way doing both together 
+    const playlist = await PlayList.findOne({ _id: playlistId, owner: req.user._id });
+    if (!playlist) {
+        throw new ApiError(403, "Playlist not found or you are not authorized to modify it");
+    }
+    // Replaced findById with exists for Video Validation:
+    // Instead of fetching the entire video document, Video.exists() checks if the video exists more efficiently.
+    // const getVideoDetails = await Video.findById(videoId);
+    const videoExists = await Video.exists({ _id: videoId });
+    if (!videoExists) {
+        throw new ApiError(400, "No video with such id ");
+    }
+    const addVideoToPlaylist = await PlayList.findByIdAndUpdate(
+        playlistId,
+        { 
+            //This operator ensures that the video ID is added only if it doesn’t already exist in the video array. If duplicates are not a concern
+            $addToSet: { video: videoId }
+        },
+        { 
+            new: true,////this way we are sending the new updated value
+        },
+    )
+    if (!addVideoToPlaylist) {
+        throw new ApiError(500, "Error while adding video to playlist");
+    }
+    return res.status(200).json(
+        new ApiResponse(200, addVideoToPlaylist, " Video successfully added to  Playlists !!!")
+    )
 })
 
 const removeVideoFromPlaylist = asynHandler(async (req, res) => {
     const { playlistId, videoId } = req.params
+    if (!isValidObjectId(playlistId) || !isValidObjectId(videoId)) {
+        throw new ApiError(400, "playlistId or videoId is not valid");
+    }
+    const playlist = await PlayList.findOne({ _id: playlistId, owner: req.user._id });
+    if (!playlist) {
+        throw new ApiError(403, "Playlist not found or you are not authorized to modify it");
+    }
 
+    const videoExists = await Video.exists({ _id: videoId });
+    if (!videoExists) {
+        throw new ApiError(400, "No video with such id ");
+    }
+    const addVideoToPlaylist = await PlayList.findByIdAndUpdate(
+        playlistId,
+        { 
+            //This operator ensures that the video ID is added only if it doesn’t already exist in the video array. If duplicates are not a concern
+            $pull: { video: videoId }
+        },
+        { 
+            new: true,////this way we are sending the new updated value
+        },
+    )
+    if (!addVideoToPlaylist) {
+        throw new ApiError(500, "Error while deleting video to playlist");
+    }
+    return res.status(200).json(
+        new ApiResponse(200, addVideoToPlaylist, " Video successfully deleted from Playlists !!!")
+    )
 })
 
 const deletePlaylist = asynHandler(async (req, res) => {

@@ -188,6 +188,7 @@ const updateVideo = asynHandler(async (req, res) => {
     if (!thumbnail) {
         throw new ApiError(400, "file is not uploaded")
     }
+    //we usually use this way when want to set multiple items together
     const video = await Video.findByIdAndUpdate(
         videoId,
         {
