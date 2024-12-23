@@ -46,17 +46,18 @@ const getUserPlaylists = asynHandler(async (req, res) => {
     }
     const getUserPlaylists = await PlayList.aggregate(
         [
-            { $match:
-                { 
+            {
+                $match:
+                {
                     owner: mongoose.Types.ObjectId.createFromHexString(userId)
                 }
             },
             {
                 $project: {
-                    name: 1,             
-                    description: 1, 
+                    name: 1,
+                    description: 1,
                     //as we are returning size here thats why we will not returning array of video id
-                    videosCount: { $size: "$video",},
+                    videosCount: { $size: "$video", },
                 },
             },
         ]
@@ -75,6 +76,70 @@ const getPlaylistById = asynHandler(async (req, res) => {
     if (!isValidObjectId(playlistId)) {
         throw new ApiError(400, "playlistId is not valid");
     }
+    const playlist = await PlayList.findOne({ _id: playlistId, owner: req.user._id });
+    if (!playlist) {
+        throw new ApiError(403, "Playlist not found or you are not authorized to modify it");
+    }
+    const getPlaylistById = await PlayList.aggregate([
+        {
+            $match: {
+                _id: mongoose.Types.ObjectId.createFromHexString(playlistId),
+            }
+        },
+        {
+            $lookup: {
+                from: "videos",
+                localField: "video",
+                foreignField: "_id",
+                as: "eachVideoDetail",
+                pipeline: [
+                    {//we will also need the userName just like youtube
+                        $lookup: {
+                            from: "users",
+                            localField: "owner",
+                            foreignField: "_id",
+                            as: "ownerDetails",
+                        }
+                    },
+                    {
+                        $addFields: {
+                            owner: {
+                                $first: "$ownerDetails" //here we are doing this because lookup will return an array even though owner is 1 only so getting the first element
+                                //now this does not remove ownerFiled but what adds this that has exact same value as ownerFiled but not array 
+                                //CHECK about.txt => 18.
+                            }
+                        }
+                    },
+                    {
+                        $project: {
+                            title: 1,
+                            thuthumbnail: 1,
+                            duration: 1,
+                            owner: {
+                                userName: 1,
+                                avatar: 1,
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $project: {
+                name: 1,
+                description: 1,
+                eachVideoDetail: 1,
+                owner: 1,
+            }
+        },
+    ])
+    if (!getPlaylistById) {
+        throw new ApiError(400, "Error in this playlist")
+    }
+    //check the call in about.js very good eg 19.
+    return res.status(200).json(
+        new ApiResponse(200, getPlaylistById, "Playlists fetced successfully!!!")
+    )
 
 })
 
@@ -105,11 +170,11 @@ const addVideoToPlaylist = asynHandler(async (req, res) => {
     }
     const addVideoToPlaylist = await PlayList.findByIdAndUpdate(
         playlistId,
-        { 
+        {
             //This operator ensures that the video ID is added only if it doesn’t already exist in the video array. If duplicates are not a concern
             $addToSet: { video: videoId }
         },
-        { 
+        {
             new: true,////this way we are sending the new updated value
         },
     )
@@ -137,11 +202,11 @@ const removeVideoFromPlaylist = asynHandler(async (req, res) => {
     }
     const addVideoToPlaylist = await PlayList.findByIdAndUpdate(
         playlistId,
-        { 
+        {
             //This operator ensures that the video ID is added only if it doesn’t already exist in the video array. If duplicates are not a concern
             $pull: { video: videoId }
         },
-        { 
+        {
             new: true,////this way we are sending the new updated value
         },
     )

@@ -24,6 +24,7 @@ can declare in Prettier that always end with ;
     b. /prettierignore : which file should be ignored 
 
 
+
 8. Constans.js : it stores the variable that will be used in many files so if changes will be needed 
 we can directly can it in constants its just like env but it is not hided
 
@@ -48,7 +49,7 @@ This all happens in between when the req is made and res is send
 
 12. mongoose-aggregate-paginate-v2 :  add-on for Mongoose that simplifies pagination
 
- -> When you work with a lot of data in a database, 
+-> When you work with a lot of data in a database, 
 you might want to show only a little bit at a time, 
 like showing 10 users per page on a website. 
 This process is called pagination. The mongoose-aggregate-paginate-v2 package is a tool that makes 
@@ -62,7 +63,7 @@ If you’re using aggregation to filter or sort your data in complex ways,
 pagination can be tricky. 
 This package helps you add pagination to those complex queries easily.
 
- => USED IN VIDOES.MODEL.JS 
+ => USED IN VIDOES.MODEL.JS /vIDOES.CONTROLLER.JS ETC
 
 
 13. jsonwebtoken (JWT for short)
@@ -126,7 +127,7 @@ Think of pre middleware as a checklist for Mongoose that says, “Before you do 
     pre middleware can automatically hash the password before it’s saved to the database.
 
 
-16. Here note this (req,res,next) lets say inside a finction we are only usigng req and next and res is not used
+16. Here note this (req,res,next) lets say inside a function we are only using req and next and res is not used
    so what we can do is pss it like this (req,_, next)
 
 
@@ -153,3 +154,69 @@ Think of pre middleware as a checklist for Mongoose that says, “Before you do 
    Access Token: With a short expiration (like 15 minutes to 1 hour), access tokens minimize the window of misuse. Even if a user or an attacker gains temporary access, the token’s limited lifetime restricts its usefulness.
 
    Benefits of Storin
+
+
+
+   18. for file playlist/controllers line number 102
+   Example before $addFields:
+      json
+      Copy code
+      {
+      "_id": "videoId",
+      "title": "Video Title",
+      "ownerDetails": [
+         {
+            "_id": "userId",
+            "username": "user1",
+            "fullName": "User One",
+            "avatar": "avatar_url_1"
+         }
+      ]
+      }
+      Example after $addFields: { owner: { $first: "$ownerDetails" } }:
+      json
+      Copy code
+      {
+      "_id": "videoId",
+      "title": "Video Title",
+      "owner": {
+         "_id": "userId",
+         "username": "user1",
+         "fullName": "User One",
+         "avatar": "avatar_url_1"
+      },
+      "ownerDetails": [
+         {
+            "_id": "userId",
+            "username": "user1",
+            "fullName": "User One",
+            "avatar": "avatar_url_1"
+         }
+      ]
+      }
+
+19.This is an example for call this {{server}}/playlists/6768ecbef934750497846dae for getting a single playist data (LINE 139 OF PLAYLIST FUNC)
+{
+    "statusCode": 200,
+    "data": [
+        {
+            "_id": "6768ecbef934750497846dae", //THIS IS PLAYLIST ID
+            "name": "modelforvicky",
+            "description": "",
+            "owner": "6768eb63f934750497846d98", //PLAYLIST OWNER
+            "eachVideoDetail": [
+                {
+                    "_id": "676007cb59e5d942ef44a87d", //VIDEO ID 
+                    "title": "collage life of pie",
+                    "duration": 5.928333,
+                    "owner": {
+                        "userName": "void",  //NOTE THE OWNER OF THIS VIDOE IS NOT THE SAME HERE LIKE OWNER OF PLAYLIST IS ace(6768eb63f934750497846d98) AND OWNER OF THIS VIDOE IS VOID(6760073d59e5d942ef44a874)
+                        "avatar": "http://res.cloudinary.com/dq2mkfaj4/image/upload/v1734346558/jb4uqdy4jcy6fscyyxo7.jpg"
+                    }
+                }
+            ]
+        }
+    ],
+    "message": "User Playlists fetced successfully!!!",
+    "success": true
+}
