@@ -219,13 +219,47 @@ const removeVideoFromPlaylist = asynHandler(async (req, res) => {
 })
 
 const deletePlaylist = asynHandler(async (req, res) => {
-    const { playlistId } = req.params
+    const { playlistId } = req.params;
+    if (!isValidObjectId(playlistId)) {
+        throw new ApiError(400, "playlistId is not valid");
+    }
+    const playlist = await PlayList.findOne({ _id: playlistId, owner: req.user._id });
+    if (!playlist) {
+        throw new ApiError(403, "Playlist not found or you are not authorized to modify it");
+    }
 
+    try {
+        await PlayList.findByIdAndDelete(playlistId);
+
+    } catch (error) {
+        throw new ApiError(500, "Something went wrong while deleting playlist")
+    }
+    return res.status(200).json(
+        new ApiResponse(200, playlist, " Playlist successfully deleted !!!")
+    )
 })
 
 const updatePlaylist = asynHandler(async (req, res) => {
     const { playlistId } = req.params
     const { name, description } = req.body
+
+    if (!isValidObjectId(playlistId)) {
+        throw new ApiError(400, "playlistId is not valid");
+    }
+    if (name.trim()==="") {
+        throw new ApiError(400, "Playlist cannot exits without name!!!")
+    }
+    const updateplaylist = await PlayList.findOneAndUpdate(
+        { _id: playlistId, owner: req.user._id },
+        { $set: { name:name , description:description} },        
+        { new: true }
+    );
+    if(!updateplaylist){
+        throw new ApiError(499, "You dont have such playlist")
+    }
+    return res.status(200).json(
+        new ApiResponse(200, updateplaylist, " Playlist successfully updated !!!")
+    )
 
 })
 
