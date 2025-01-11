@@ -8,6 +8,8 @@ import { uploadOnCloudinary, deleteFromCloudinary } from "../utils/cloudinary.js
 
 
 const getAllVideos = asynHandler(async (req, res) => {
+    //req.query means after the ? 
+    //req.params means the one after / in url 
     const { page = 1, limit = 10, query=" ", sortBy = "title", sortType = "asc", userId } = req.query
     //TODO: get all videos based on query, sort, pagination
 

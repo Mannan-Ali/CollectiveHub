@@ -438,7 +438,7 @@ const getUserChannelProfile = asynHandler(async (req, res) => {
             //this is only for the data we get from match
             //output of data is used by next stage as input
             {
-                //total number of subscriber
+                //total number of subscriber to a specific channel ( like on instagram we see followers for any account)
                 $lookup: {
                     //db converts name given to lower with s
                     from: "subscriptions",
@@ -448,7 +448,7 @@ const getUserChannelProfile = asynHandler(async (req, res) => {
                 }
             },
             {
-                //total channels i have subscribed
+                //total channels the user we are on have subscribed to ( like intagram we see following of a specific account)
                 $lookup: {
                     from: "subscriptions",
                     localField: "_id", // what do we call it here 
