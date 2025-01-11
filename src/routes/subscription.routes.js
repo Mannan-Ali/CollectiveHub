@@ -6,7 +6,7 @@ const router = Router();
 router.use(verifyJWT);//now this will be used in all the routes without declaring it
 router.route("/:channelId").post(toggleSubscription);
 router.route("/:channelId").get(getUserChannelSubscribers);
-router.route("/:subscriberId").get(getSubscribedChannels);
+router.route("/channel/:subscriberId").get(getSubscribedChannels);
 
 
 export default router;
