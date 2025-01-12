@@ -220,3 +220,43 @@ Think of pre middleware as a checklist for Mongoose that says, “Before you do 
     "message": "User Playlists fetced successfully!!!",
     "success": true
 }
+
+
+20 page 117 in likes.controller.js
+
+Without $first, the owner field would remain an array, even if it has only one element, like this:
+
+json
+Copy code
+{
+    "videoFile": "file.mp4",
+    "thumbnail": "thumbnail.jpg",
+    "title": "Amazing Video",
+    "duration": 300,
+    "views": 1000,
+    "owner": [
+        {
+            "avatar": "avatar.jpg",
+            "username": "user123",
+            "fullName": "John Doe"
+        }
+    ]
+}
+By using $first, you transform the owner field into a single object, like this:
+
+json
+Copy code
+{
+    "videoFile": "file.mp4",
+    "thumbnail": "thumbnail.jpg",
+    "title": "Amazing Video",
+    "duration": 300,
+    "views": 1000,
+    "owner": {
+        "avatar": "avatar.jpg",
+        "username": "user123",
+        "fullName": "John Doe"
+    }
+}
+
+
