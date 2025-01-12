@@ -63,7 +63,7 @@ const toggleCommentLike = asynHandler(async (req, res) => {
                 .json(new ApiResponse(201, newCommentLike, "Successfully liked the comment"))
         }
     } catch (error) {
-        throw new ApiError(500, error?.message, "Error while liking video.")
+        throw new ApiError(500, error?.message, "Error while liking comment.")
     }
 
 })
@@ -101,6 +101,42 @@ const toggleTweetLike = asynHandler(async (req, res) => {
 
 const getLikedVideos = asynHandler(async (req, res) => {
     //TODO: get all liked videos
+    try {
+        const allLikedVideos = await Like.aggregate([
+            {
+                $match: {
+                    likedBy: req.user._id
+                }
+            },
+            {
+                $lookup: {
+                    from: "videos",
+                    localField: "video",
+                    foreignField: "_id",
+                    as: "likedVideos",
+                }
+            },
+            {
+                $unwind: "$likedVideos",
+            },
+            {
+                $project: {
+                    likedVideos: {
+                        thumbnail: 1,
+                        title: 1,
+                        description: 1,
+                        duration: 1,
+                    },
+                    createdAt: 1,
+                }
+            }
+        ])
+        return res.status(200)
+            .json(new ApiResponse(200, allLikedVideos, "all liked videos!!"))
+
+    } catch (error) {
+        throw new ApiError(500, error?.message, "Error while returning allLikeVideos.")
+    }
 })
 
 export {
