@@ -222,7 +222,7 @@ Think of pre middleware as a checklist for Mongoose that says, “Before you do 
 }
 
 
-20 page 117 in likes.controller.js
+20. page 117 in likes.controller.js
 
 Without $first, the owner field would remain an array, even if it has only one element, like this:
 

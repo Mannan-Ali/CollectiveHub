@@ -114,6 +114,7 @@ const getLikedVideos = asynHandler(async (req, res) => {
                     localField: "video",
                     foreignField: "_id",
                     as: "likedVideos",
+                    //read about.txt 20 for addField Info
                     pipeline: [
                         {
                             $lookup: {
