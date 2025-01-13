@@ -6,9 +6,75 @@ import { ApiResponse } from "../utils/ApiResponse.js"
 import { asynHandler } from "../utils/asyncHandler.js"
 
 const getVideoComments = asynHandler(async (req, res) => {
-    //TODO: get all comments for a video
-    const { videoId } = req.params
-    const { page = 1, limit = 10 } = req.query
+    const { videoId } = req.params;
+    const { page = 1, limit = 10 } = req.query;
+    if (!isValidObjectId(videoId)) {
+        throw new ApiError(400, "videoId is not valid!!!")
+    }
+    const validatedPage = Number.isInteger(parseInt(page)) && parseInt(page) > 0 ? parseInt(page) : 1;
+    const validatedLimit = Number.isInteger(parseInt(limit)) && parseInt(limit) > 0 ? parseInt(limit) : 10;
+
+    // Calculate skip and limit values (how different page shoud get from which comment they should load
+    //eg: page=3 and limit=10, skip the first 20 results ((3 - 1) * 10)
+    //so page 3 will display from 21 onwards 
+    const skipValue = (validatedPage - 1) * validatedLimit;
+    const limitValue = validatedLimit;
+
+    const totalComments = await Comment.countDocuments(
+        {
+            video: videoId,
+        }
+    )
+    console.log(totalComments)
+    //this is a safety step as user can demand pages that will not have videos as total number of videos found was already displayed so this will give u page not found error 
+    if (skipValue >= totalComments) {
+        throw new ApiError(400, "Page Not found ")
+    }
+    try {
+        const videoComment = await Comment.aggregate([
+            {
+                $match: {
+                    video: mongoose.Types.ObjectId.createFromHexString(videoId)
+                }
+
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "owner",
+                    foreignField: "_id",
+                    as: "OwnerDetails",
+                }
+            },
+            {
+                $unwind: "$OwnerDetails",
+            },
+            {
+                $project: {
+                    OwnerDetails: {
+                        userName: 1,
+                        avatar: 1,
+                    },
+                    content: 1,
+                    createdAt: 1,
+                    updatedAt: 1,
+                }
+            },
+            {
+                $sort: { createdAt: -1 } // Sort by most recent comments
+            }, 
+            {
+                $skip: skipValue,
+            },
+            {
+                $limit: limitValue,
+            }
+        ])
+        return res.status(200)
+        .json(new ApiResponse(200,videoComment,"Fetched all comments on the follwing video!!!"))
+    } catch (error) {
+        throw new ApiError(500, error?.message, "Error while fetching video's comments.")
+    }
 
 })
 

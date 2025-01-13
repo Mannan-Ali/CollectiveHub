@@ -19,10 +19,13 @@ const getAllVideos = asynHandler(async (req, res) => {
     3.sorting the vidoes based on sorts
     4.pagination
     */
+   //here we are checking if the values entered for page if entered it shoud be greater than 0 and not characters. If such things are done we pass default values like 1 and 10
     const validatedPage = Number.isInteger(parseInt(page)) && parseInt(page) > 0 ? parseInt(page) : 1;
     const validatedLimit = Number.isInteger(parseInt(limit)) && parseInt(limit) > 0 ? parseInt(limit) : 10;
 
-    // Calculate skip and limit values
+    // Calculate skip and limit values (how different page shoud get from which comment they should load
+    //eg: page=3 and limit=10, skip the first 20 results ((3 - 1) * 10)
+    //so page 3 will display from 21 onwards 
     const skipValue = (validatedPage - 1) * validatedLimit;
     const limitValue = validatedLimit;
 
@@ -36,7 +39,7 @@ const getAllVideos = asynHandler(async (req, res) => {
             }
         ]
     })
-
+    //this is a safety step as user can demand pages that will not have videos as total number of videos found was already displayed so this will give u page not found error 
     if (skipValue >= totalVideos) {
         throw new ApiError(400, "Page Not found ")
     }

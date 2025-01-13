@@ -10,24 +10,20 @@ Inside Source:
 6. utils : utilities files like that can be used multiple times like 
            file upload , mailing , tokens handling 
 
-
 7. Prettier : (Not the vs code one but the plugin in nodejs)
-why do we use it ?
-when we code professionally lot of people work on a single project 
-so what happens is like someone does not put ; in js files but others do so we 
-can declare in Prettier that always end with ; 
+    why do we use it ?
+    when we code professionally lot of people work on a single project 
+    so what happens is like someone does not put ; in js files but others do so we 
+    can declare in Prettier that always end with ; 
 
--> we can make our custom pretier 
- :-> run npm i -D Prettier
- :-> now we need to create a 2 files
-    a. .prettierrc : here will we write what we need even if we forget to do like trailling commas wherever needed
-    b. /prettierignore : which file should be ignored 
-
-
+    -> we can make our custom pretier 
+    :-> run npm i -D Prettier
+    :-> now we need to create a 2 files
+        a. .prettierrc : here will we write what we need even if we forget to do like trailling commas wherever needed
+        b. /prettierignore : which file should be ignored 
 
 8. Constans.js : it stores the variable that will be used in many files so if changes will be needed 
-we can directly can it in constants its just like env but it is not hided
-
+    we can directly can it in constants its just like env but it is not hided
 
 9. middleware : (can aslo be called verfication or checking like if req has xyz than olny send res)
    ->when the req is made to the server 
@@ -35,36 +31,34 @@ we can directly can it in constants its just like env but it is not hided
    ->the browser is worty of the data or can the browser understand the data 
    ->who is the browser or whos frontend it is using this middleware 
    ->
-This all happens in between when the req is made and res is send 
+    This all happens in between when the req is made and res is send 
  
-
 10. In total app.get/post etc we have ( err,req,res,next)
     we know that next is used to tell the compilar to move onto the next function or next line of code we are 
     done here ,mostly used with custom middlewares 
 
 11. Now we will work on models , here points to remember are
--> the photos and vidoes will be stroed on 3rd party apps like aws and 
-   in return we will get a link that we will store in db 
-   Model link : https://app.eraser.io/workspace/YtPqZ1VogxGy1jzIDkzj
+    -> the photos and vidoes will be stroed on 3rd party apps like aws and 
+    in return we will get a link that we will store in db 
+    Model link : https://app.eraser.io/workspace/YtPqZ1VogxGy1jzIDkzj
 
 12. mongoose-aggregate-paginate-v2 :  add-on for Mongoose that simplifies pagination
 
--> When you work with a lot of data in a database, 
-you might want to show only a little bit at a time, 
-like showing 10 users per page on a website. 
-This process is called pagination. The mongoose-aggregate-paginate-v2 package is a tool that makes 
-pagination easier when you’re using Mongoose (a library for MongoDB,
- a popular database) with aggregation (a way to get more advanced results from the database).
+    -> When you work with a lot of data in a database, 
+    you might want to show only a little bit at a time, 
+    like showing 10 users per page on a website. 
+    This process is called pagination. The mongoose-aggregate-paginate-v2 package is a tool that makes 
+    pagination easier when you’re using Mongoose (a library for MongoDB,
+    a popular database) with aggregation (a way to get more advanced results from the database).
 
- -> Why Use It?
-Imagine you have 1,000 users in your database. You don’t want to load all of them at once because it would be too slow.
-Instead, you can use pagination to show, say, 10 users at a time.
-If you’re using aggregation to filter or sort your data in complex ways, 
-pagination can be tricky. 
-This package helps you add pagination to those complex queries easily.
+    -> Why Use It?
+    Imagine you have 1,000 users in your database. You don’t want to load all of them at once because it would be too slow.
+    Instead, you can use pagination to show, say, 10 users at a time.
+    If you’re using aggregation to filter or sort your data in complex ways, 
+    pagination can be tricky. 
+    This package helps you add pagination to those complex queries easily.
 
- => USED IN VIDOES.MODEL.JS /vIDOES.CONTROLLER.JS ETC
-
+    => USED IN VIDOES.MODEL.JS /vIDOES.CONTROLLER.JS ETC
 
 13. jsonwebtoken (JWT for short)
 
@@ -95,41 +89,35 @@ This package helps you add pagination to those complex queries easily.
      ->Verifying the Password: 
      When the user logs in, bcrypt takes the password they typed, hashes it the same way, and checks if it matches the stored hash. If it does, they’re allowed to log in. 
 
-
-
-
 13 and 14 part together : . when we have unique passwrd then why do we need toke n?
 
-Great question! Let’s break down why we need both a password and a token.
+    Great question! Let’s break down why we need both a password and a token.
 
- 1. Passwords - For Logging In
- Purpose: The password is used to identify and verify a user. When a user first logs in, they enter their password to prove they are who they say they are.
- One-Time Check: Once the password is verified at login, we don’t want to ask the user for it over and over because that’s annoying and insecure (passwords can be intercepted if sent frequently).
- 
- 2. Tokens - For Staying Logged In Securely
- Purpose: The token acts like a "temporary pass" to allow the user to access secure parts of the app without needing to re-enter their password.
- Convenience and Security: After the user logs in, they get a token that’s stored securely on their device. When they visit secure pages or make requests, they just send the token instead of their password.
+    1. Passwords - For Logging In
+    Purpose: The password is used to identify and verify a user. When a user first logs in, they enter their password to prove they are who they say they are.
+    One-Time Check: Once the password is verified at login, we don’t want to ask the user for it over and over because that’s annoying and insecure (passwords can be intercepted if sent frequently).
+    
+    2. Tokens - For Staying Logged In Securely
+    Purpose: The token acts like a "temporary pass" to allow the user to access secure parts of the app without needing to re-enter their password.
+    Convenience and Security: After the user logs in, they get a token that’s stored securely on their device. When they visit secure pages or make requests, they just send the token instead of their password.
 
-User Signs Up: Password is hashed with bcrypt and stored safely.
-User Logs In: If the password matches, the server creates a JWT token for them.
-
+    User Signs Up: Password is hashed with bcrypt and stored safely.
+    User Logs In: If the password matches, the server creates a JWT token for them.
 
 15. Mongoose Pre MiddleWare:
 
-The pre middleware lets you do something before an action happens on a document (like before saving or updating it).
+    The pre middleware lets you do something before an action happens on a document (like before saving or updating it).
 
-How pre Middleware Works
-Think of pre middleware as a checklist for Mongoose that says, “Before you do X, make sure you do Y first.” Here’s how it might work:
+    How pre Middleware Works
+    Think of pre middleware as a checklist for Mongoose that says, “Before you do X, make sure you do Y first.” Here’s how it might work:
 
- ** "Main reson we are using pre here" : 
-    Define a Schema and Add Pre Middleware: Let’s say you’re creating a user schema with fields like username and password.
-    Before Saving: You want to hash the password every time it’s saved so that it’s not stored as plain text. 
-    pre middleware can automatically hash the password before it’s saved to the database.
-
+    ** "Main reson we are using pre here" : 
+        Define a Schema and Add Pre Middleware: Let’s say you’re creating a user schema with fields like username and password.
+        Before Saving: You want to hash the password every time it’s saved so that it’s not stored as plain text. 
+        pre middleware can automatically hash the password before it’s saved to the database.
 
 16. Here note this (req,res,next) lets say inside a function we are only using req and next and res is not used
    so what we can do is pss it like this (req,_, next)
-
 
 17. WHY USING COOKIES IS BETTER AND SECURE OF ACCESS AND REFRESH TOKENS :
     When you set tokens in secure cookies, you’re adding a layer of protection, especially if you configure the cookies with specific attributes to limit visibility and access. Here’s how it works and what the risks are:
@@ -154,8 +142,6 @@ Think of pre middleware as a checklist for Mongoose that says, “Before you do 
    Access Token: With a short expiration (like 15 minutes to 1 hour), access tokens minimize the window of misuse. Even if a user or an attacker gains temporary access, the token’s limited lifetime restricts its usefulness.
 
    Benefits of Storin
-
-
 
 18. for file playlist/controllers line number 102
    Example before $addFields:
@@ -196,67 +182,66 @@ Think of pre middleware as a checklist for Mongoose that says, “Before you do 
       }
 
 19.This is an example for call this {{server}}/playlists/6768ecbef934750497846dae for getting a single playist data (LINE 139 OF PLAYLIST FUNC)
-{
-    "statusCode": 200,
-    "data": [
-        {
-            "_id": "6768ecbef934750497846dae", //THIS IS PLAYLIST ID
-            "name": "modelforvicky",
-            "description": "",
-            "owner": "6768eb63f934750497846d98", //PLAYLIST OWNER
-            "eachVideoDetail": [
-                {
-                    "_id": "676007cb59e5d942ef44a87d", //VIDEO ID 
-                    "title": "collage life of pie",
-                    "duration": 5.928333,
-                    "owner": {
-                        "userName": "void",  //NOTE THE OWNER OF THIS VIDOE IS NOT THE SAME HERE LIKE OWNER OF PLAYLIST IS ace(6768eb63f934750497846d98) AND OWNER OF THIS VIDOE IS VOID(6760073d59e5d942ef44a874)
-                        "avatar": "http://res.cloudinary.com/dq2mkfaj4/image/upload/v1734346558/jb4uqdy4jcy6fscyyxo7.jpg"
+    {
+        "statusCode": 200,
+        "data": [
+            {
+                "_id": "6768ecbef934750497846dae", //THIS IS PLAYLIST ID
+                "name": "modelforvicky",
+                "description": "",
+                "owner": "6768eb63f934750497846d98", //PLAYLIST OWNER
+                "eachVideoDetail": [
+                    {
+                        "_id": "676007cb59e5d942ef44a87d", //VIDEO ID 
+                        "title": "collage life of pie",
+                        "duration": 5.928333,
+                        "owner": {
+                            "userName": "void",  //NOTE THE OWNER OF THIS VIDOE IS NOT THE SAME HERE LIKE OWNER OF PLAYLIST IS ace(6768eb63f934750497846d98) AND OWNER OF THIS VIDOE IS VOID(6760073d59e5d942ef44a874)
+                            "avatar": "http://res.cloudinary.com/dq2mkfaj4/image/upload/v1734346558/jb4uqdy4jcy6fscyyxo7.jpg"
+                        }
                     }
-                }
-            ]
-        }
-    ],
-    "message": "User Playlists fetced successfully!!!",
-    "success": true
-}
-
+                ]
+            }
+        ],
+        "message": "User Playlists fetced successfully!!!",
+        "success": true
+    }
 
 20. page 117 in likes.controller.js
 
-Without $first, the owner field would remain an array, even if it has only one element, like this:
+    Without $first, the owner field would remain an array, even if it has only one element, like this:
 
-json
-Copy code
-{
-    "videoFile": "file.mp4",
-    "thumbnail": "thumbnail.jpg",
-    "title": "Amazing Video",
-    "duration": 300,
-    "views": 1000,
-    "owner": [
-        {
+    json
+    Copy code
+    {
+        "videoFile": "file.mp4",
+        "thumbnail": "thumbnail.jpg",
+        "title": "Amazing Video",
+        "duration": 300,
+        "views": 1000,
+        "owner": [
+            {
+                "avatar": "avatar.jpg",
+                "username": "user123",
+                "fullName": "John Doe"
+            }
+        ]
+    }
+    By using $first, you transform the owner field into a single object, like this:
+
+    json
+    Copy code
+    {
+        "videoFile": "file.mp4",
+        "thumbnail": "thumbnail.jpg",
+        "title": "Amazing Video",
+        "duration": 300,
+        "views": 1000,
+        "owner": {
             "avatar": "avatar.jpg",
             "username": "user123",
             "fullName": "John Doe"
         }
-    ]
-}
-By using $first, you transform the owner field into a single object, like this:
-
-json
-Copy code
-{
-    "videoFile": "file.mp4",
-    "thumbnail": "thumbnail.jpg",
-    "title": "Amazing Video",
-    "duration": 300,
-    "views": 1000,
-    "owner": {
-        "avatar": "avatar.jpg",
-        "username": "user123",
-        "fullName": "John Doe"
     }
-}
 
 
