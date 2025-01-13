@@ -48,6 +48,7 @@ import tweetRouter from "./routes/tweet.routes.js";
 import playlistRouter from "./routes/playlist.routes.js"
 import subscriptionRouter from "./routes/subscription.routes.js";
 import likeRouter from "./routes/likes.routes.js";
+import commentRouter from "./routes/comment.routes.js";
 //routes declaration
 //NOTE : now as everthing is in different file you will have to use app.use that 
 //is a middleware instead of get,post to bring evething together
@@ -58,6 +59,7 @@ app.use(process.env.ROUTES_TWEET, tweetRouter)
 app.use(process.env.ROUTES_PLAYLIST, playlistRouter)
 app.use(process.env.ROUTES_SUBSCRIPTION, subscriptionRouter)
 app.use(process.env.ROUTES_LIKE, likeRouter)
+app.use(process.env.ROUTES_COMMENT, commentRouter)
 //Now what happens is using middle ware we are on router localhost:8000/api/v1/users which will call 
 //routers in user.router.js go there
 export { app };
