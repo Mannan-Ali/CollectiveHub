@@ -1,35 +1,33 @@
-import { v2 as cloudinary } from "cloudinary"
-import fs from "fs"
-
+import { v2 as cloudinary } from "cloudinary";
+import fs from "fs";
 
 cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
 const uploadOnCloudinary = async (localFilePath) => {
-    try {
-        if (!localFilePath) return null
-        //upload the file on cloudinary
-        const response = await cloudinary.uploader.upload(localFilePath, {
-            resource_type: "auto"
-        })
-        // file has been uploaded successfull
-        //console.log("file is uploaded on cloudinary ", response.url);
-        fs.unlinkSync(localFilePath)
-        return response;
-
-    } catch (error) {
-        fs.unlinkSync(localFilePath) // remove the locally saved temporary file as the upload operation got failed
-        return null;
-    }
-}
+  try {
+    if (!localFilePath) return null;
+    //upload the file on cloudinary
+    const response = await cloudinary.uploader.upload(localFilePath, {
+      resource_type: "auto",
+    });
+    // file has been uploaded successfull
+    //console.log("file is uploaded on cloudinary ", response.url);
+    fs.unlinkSync(localFilePath);
+    return response;
+  } catch (error) {
+    fs.unlinkSync(localFilePath); // remove the locally saved temporary file as the upload operation got failed
+    return null;
+  }
+};
 
 const deleteFromCloudinary = async (cloudinaryFilepath) => {
-    try {
-      if (!cloudinaryFilepath) return null;
-      /*
+  try {
+    if (!cloudinaryFilepath) return null;
+    /*
     cloudinaryFilepath.split("/"): Splits the Cloudinary file path into an array of segments using / as the delimiter. For example, if the cloudinaryFilepath is "https://res.cloudinary.com/demo/image/upload/v1600451234/myImage.jpg", this will give you an array like ["https:", "", "res.cloudinary.com", "demo", "image", "upload", "v1600451234", "myImage.jpg"].
     .pop(): Retrieves the last element of this array. In the example above, it would return "myImage.jpg".
 
@@ -37,25 +35,23 @@ const deleteFromCloudinary = async (cloudinaryFilepath) => {
 
     This is done to extract the public ID of the file stored on Cloudinary, which is what is needed to delete the file. The public ID is the part of the Cloudinary URL that uniquely identifies the file.
       */
-    const resourceType = cloudinaryFilepath.includes("video") ? "video" : "image";
-      const fileName = cloudinaryFilepath.split("/").pop().split(".")[0];
-      console.log(fileName)
-      //we need public id part as destory function only takes that
-      const response = await cloudinary.uploader.destroy(fileName,{resource_type:resourceType});
-      return response;
-    } catch (error) {
-      console.log("Error while deleting file from cloudinary : ", error);
-      return null;
-    }
-  };
+    const resourceType = cloudinaryFilepath.includes("video")
+      ? "video"
+      : "image";
+    const fileName = cloudinaryFilepath.split("/").pop().split(".")[0];
+    console.log(fileName);
+    //we need public id part as destory function only takes that
+    const response = await cloudinary.uploader.destroy(fileName, {
+      resource_type: resourceType,
+    });
+    return response;
+  } catch (error) {
+    console.log("Error while deleting file from cloudinary : ", error);
+    return null;
+  }
+};
 
-export {uploadOnCloudinary,deleteFromCloudinary};
-
-
-
-
-
-
+export { uploadOnCloudinary, deleteFromCloudinary };
 
 // //we are making this as an util so we can use it for image ,vide and text .
 // import { v2 as cloudinary } from 'cloudinary';

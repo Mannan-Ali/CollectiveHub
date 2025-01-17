@@ -16,16 +16,15 @@ instead of writting again and again catch(error) code we send it here to handle 
 if no erros occurs it gets executed here
 */
 
-//2.1] way here using promise 
+//2.1] way here using promise
 const asynHandler = (reqhandler) => {
-    return ((req,res,next)=>{
-        Promise.resolve(reqhandler(req,res,next))
-        .catch((err)=>{
-           next(err) 
-        })
-    })
-}
-export {asynHandler}
+  return (req, res, next) => {
+    Promise.resolve(reqhandler(req, res, next)).catch((err) => {
+      next(err);
+    });
+  };
+};
+export { asynHandler };
 
 /*2.2]
 const asynHandler = (reqhandler) => {

@@ -118,3 +118,12 @@ dist
 .pnp.*
 
 # End of https://mrkandreev.name/snippets/gitignore-generator/#Node
+
+
+#custom files
+
+# middleware
+src/middlewares/copyauth.middleware.js
+src/middlewares/copymulter.middleware.js
+
+

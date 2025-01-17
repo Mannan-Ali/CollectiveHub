@@ -1,1 +1,1 @@
-export const DB_NAME = "TubeVaullt"
+export const DB_NAME = "TubeVaullt";

@@ -3,54 +3,54 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
 const userSchema = new mongoose.Schema(
-    {
-        userName : {
-            type : String,
-            required : [true, 'UserName  is required '],
-            lowercase : true,
-            unique : [true, 'Enter Unique name '],
-            trim : true,
-            index : true // makes it easy to search like if you know this data will be used 
-            // for searching then do index true
-        },
-        email : {
-            type : String,
-            required : [true, 'email is required '],
-            lowercase : true,
-            unique : [true, 'Enter Unique name '],
-            trim : true, // using this we can remove whitespace 
-        },
-        fullName : {
-            type : String,
-            required : [true, 'fullName is required '],
-            trim : true,
-        },
-        avatar : {
-            type : String, // using cloudniary url 
-            required : true,
-        },
-        coverImage : {
-            type : String, // using cloudniary url 
-        },
-        watchHistory : [ //this is array as we will keep adding this value 
-            { 
-                type : mongoose.Schema.Types.ObjectId,
-                ref : "Video",
-            }
-        ],
-        //challenge : how we will encrypt the password as in database there  should be encryption and 
-        // real password to match
-        password : {
-            type : String,
-            required : [true, 'Password is required ']
-        },
-        refreshToken : {
-            type : String,
-        }
-
+  {
+    userName: {
+      type: String,
+      required: [true, "UserName  is required "],
+      lowercase: true,
+      unique: [true, "Enter Unique name "],
+      trim: true,
+      index: true, // makes it easy to search like if you know this data will be used
+      // for searching then do index true
     },
-    { timestamps: true }
-)
+    email: {
+      type: String,
+      required: [true, "email is required "],
+      lowercase: true,
+      unique: [true, "Enter Unique name "],
+      trim: true, // using this we can remove whitespace
+    },
+    fullName: {
+      type: String,
+      required: [true, "fullName is required "],
+      trim: true,
+    },
+    avatar: {
+      type: String, // using cloudniary url
+      required: true,
+    },
+    coverImage: {
+      type: String, // using cloudniary url
+    },
+    watchHistory: [
+      //this is array as we will keep adding this value
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Video",
+      },
+    ],
+    //challenge : how we will encrypt the password as in database there  should be encryption and
+    // real password to match
+    password: {
+      type: String,
+      required: [true, "Password is required "],
+    },
+    refreshToken: {
+      type: String,
+    },
+  },
+  { timestamps: true }
+);
 
 /*
 what are we doing here is that 1 parameter is save there are more such 
@@ -62,21 +62,20 @@ use this , it does not get reference to this so how will we access userSchema va
 async : as it takes tile 
 next : as this is a middleware 
 */
-userSchema.pre("save", async function (next){
-    // without this the code will even encrypt when basics like avatar or name for everytime
-    //is changed hence it is important
-    if(!this.isModified("password")) return next(); 
-    //bcrypt.hash(this.password, 10) 10 is the total rounds 
-    this.password = await bcrypt.hash(this.password, 10)
-    next()
-})
-//now we encrptyed the password but the user on frontend will type 
+userSchema.pre("save", async function (next) {
+  // without this the code will even encrypt when basics like avatar or name for everytime
+  //is changed hence it is important
+  if (!this.isModified("password")) return next();
+  //bcrypt.hash(this.password, 10) 10 is the total rounds
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
+});
+//now we encrptyed the password but the user on frontend will type
 // password in string form only so how to compare both- so we create a method isPasswordCorrect using mongoose
 //BASIC SYMTAX FOR :  creating method is SchemaName.method.method_name
-userSchema.methods.isPasswordCorrect = async function(password){
-    return await bcrypt.compare(password,this.password)//one is password passed by user and other is encrypted one
-}
-
+userSchema.methods.isPasswordCorrect = async function (password) {
+  return await bcrypt.compare(password, this.password); //one is password passed by user and other is encrypted one
+};
 
 /*
 READ BELOW TOO
@@ -90,35 +89,35 @@ Now refresh token will be stored in db thats why it is there in model
 but access token will not be stored ,we are ussing botn session and cookies so 
 
 */
-userSchema.methods.generateAccessToken = function(){
-    return jwt.sign(
-        {
-            _id : this._id,
-            email : this.email,
-            username : this.username,
-            fullName : this.fullName
-        },
-        process.env.ACCESS_TOKEN_SECRET,
-        {
-            expiresIn :process.env.ACCESS_TOKEN_EXPIRY
-        }
-    )
-}
-userSchema.methods.generateRefreshToken = function(){
-    return jwt.sign(
-        {
-            _id : this._id,
-        },
-        process.env.ACCESS_TOKEN_SECRET,
-        {
-            expiresIn :process.env.ACCESS_TOKEN_EXPIRY
-        }
-    )
-}
+userSchema.methods.generateAccessToken = function () {
+  return jwt.sign(
+    {
+      _id: this._id,
+      email: this.email,
+      username: this.username,
+      fullName: this.fullName,
+    },
+    process.env.ACCESS_TOKEN_SECRET,
+    {
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
+    }
+  );
+};
+userSchema.methods.generateRefreshToken = function () {
+  return jwt.sign(
+    {
+      _id: this._id,
+    },
+    process.env.ACCESS_TOKEN_SECRET,
+    {
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
+    }
+  );
+};
 
-export const User = mongoose.model("User", userSchema)
+export const User = mongoose.model("User", userSchema);
 
-//REFREHS TOKEN AND ACCESS TOKEN 
+//REFREHS TOKEN AND ACCESS TOKEN
 // when the users accesstoken expire he can go to an endpoint if refresh token not expired then give new access token
 /* 
 What Are Access Tokens and Refresh Tokens?

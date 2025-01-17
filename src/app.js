@@ -3,25 +3,27 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 const app = express();
 
-//to interact with middleware like bodyparser we use app.use 
+//to interact with middleware like bodyparser we use app.use
 //even cors is used this way
 //cors is used to specify which url request to allow
-app.use(cors({
+app.use(
+  cors({
     //which which origins we are allowing it to access data from our server
     origin: process.env.CORS_ORIGIN,
-    credentials: true
-}))
+    credentials: true,
+  })
+);
 
 //now the data we will get on our server will be in different format like some will
 //be from params some in json form some in form body etc . now if we are taking json data
-//then we will like to limit the amount of json data that is done using this 
+//then we will like to limit the amount of json data that is done using this
 //to do this we have used body-parser but now it can be direclty done in express
-app.use(express.json({ limit: "16kb" }))
+app.use(express.json({ limit: "16kb" }));
 
 //for URL : now we know in url we get data in encoded form like ?wfwewefe
-// so here we needed to tell the server take care of those reqs that are coming directly 
+// so here we needed to tell the server take care of those reqs that are coming directly
 //from url to decode it
-app.use(express.urlencoded({ extended: true, limit: "16kb" }))
+app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 
 /*
 we have seen this before in web dev course : it is used so that the static files 
@@ -34,33 +36,33 @@ you tell the server to serve files from the public folder whenever they’re req
 For example, if there’s an image named logo.png in the public folder, 
 the browser can access it directly at http://yourserver.com/logo.png.
 */
-app.use(express.static("public"))
+app.use(express.static("public"));
 
 //using this we can access and also sendthe cookies from the
 //incoming request from the client side (browser).
 //mainly the cookies are secure cooikies that can read and implemented by servers
-app.use(cookieParser())
+app.use(cookieParser());
 
-//routes 
+//routes
 import { router } from "./routes/user.routes.js";
-import videoRouter from "./routes/video.routes.js"
+import videoRouter from "./routes/video.routes.js";
 import tweetRouter from "./routes/tweet.routes.js";
-import playlistRouter from "./routes/playlist.routes.js"
+import playlistRouter from "./routes/playlist.routes.js";
 import subscriptionRouter from "./routes/subscription.routes.js";
 import likeRouter from "./routes/likes.routes.js";
 import commentRouter from "./routes/comment.routes.js";
 //routes declaration
-//NOTE : now as everthing is in different file you will have to use app.use that 
+//NOTE : now as everthing is in different file you will have to use app.use that
 //is a middleware instead of get,post to bring evething together
 
-app.use(process.env.ROUTES_USER,router)
-app.use(process.env.ROUTES_VIDEO, videoRouter)
-app.use(process.env.ROUTES_TWEET, tweetRouter)
-app.use(process.env.ROUTES_PLAYLIST, playlistRouter)
-app.use(process.env.ROUTES_SUBSCRIPTION, subscriptionRouter)
-app.use(process.env.ROUTES_LIKE, likeRouter)
-app.use(process.env.ROUTES_COMMENT, commentRouter)
-//Now what happens is using middle ware we are on router localhost:8000/api/v1/users which will call 
+app.use(process.env.ROUTES_USER, router);
+app.use(process.env.ROUTES_VIDEO, videoRouter);
+app.use(process.env.ROUTES_TWEET, tweetRouter);
+app.use(process.env.ROUTES_PLAYLIST, playlistRouter);
+app.use(process.env.ROUTES_SUBSCRIPTION, subscriptionRouter);
+app.use(process.env.ROUTES_LIKE, likeRouter);
+app.use(process.env.ROUTES_COMMENT, commentRouter);
+//Now what happens is using middle ware we are on router localhost:8000/api/v1/users which will call
 //routers in user.router.js go there
 export { app };
 
