@@ -1,7 +1,3 @@
-/*
-The controll file contains functionallity of 
-as we dont have frontend we will be using postman 
-*/
 import { asynHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js";
@@ -38,18 +34,6 @@ const generateAccessANDRefreshToken = async (userID) => {
 };
 //get user detail from frontend
 const registerUser = asynHandler(async (req, res) => {
-  //steps for register user :-
-  //get user detail from frontend
-  //we need everything from user defined in user db other than watchistory and refreshToken
-  //validation for correct way of user sending data , not empty data is send
-  //check if user already exits : username and email (anyone is also okh)
-  //check for images ,check for avatar
-  //send/upload to cloudinary
-  //create user object - then create entry in db
-  //remove password and refresh token filed from response as user cant know how encrypted pass and refesh look
-  //chcek user creation
-  //return response
-
   const { userName, fullName, email, password } = req.body;
   //if empty
   // if (fullName === " ") {
@@ -110,10 +94,6 @@ const registerUser = asynHandler(async (req, res) => {
     email,
     password,
   });
-  //removing password and refreshtoken from response then check if user is empty or null or error or existed or not the if part here
-  //this user._id is added by mongodb for uniqueness using this we can check if user exits
-  //now here inside select we give values that we dont want to go to user
-  //eveything is selected by default so we give what we dont want to go in response this could have been done with user also above
   const SelectedChkUser = await User.findById(user._id).select(
     "-password -refreshToken"
   );
@@ -133,14 +113,6 @@ const registerUser = asynHandler(async (req, res) => {
 });
 
 const loginUser = asynHandler(async (req, res) => {
-  /*TODOS
-    1. get data from req body
-    2. (username or email) based accesss
-    3. find the user if present 
-    4. check password for login 
-    5. if correct generate access and refresh Token
-    6. send access and refresh in form of secure of cookies
-    */
   const { userName, email, password } = req.body;
 
   //checking for anyone is provided or not
@@ -181,9 +153,6 @@ const loginUser = asynHandler(async (req, res) => {
   const options = {
     httpOnly: true,
     secure: true,
-    //if this is not done anyone or the user can modify your cookies in browsser
-    //but when this 2 are set true only the server can modify this cookies
-    //not possible by frontend
   };
   //we are able to use this cookies as app.js has cookieparser
   return res
@@ -242,24 +211,6 @@ const refreshAccessToken = asynHandler(async (req, res) => {
     throw new ApiError(401, "Unauthoriez request in refrehAccess Token");
   }
   //verify token
-  /*
-    //what we did here is passed specific users refrehToken and decoded it 
-    //what actually happens is we have already send res with user unique id and also refrehToken
-    //now we are verifying that 3 things
-    hen you call jwt.verify, you are decrypting the token to see if it:
-
-    Matches the expected format and signature (based on ACCESS_TOKEN_SECRET).
-    Has a valid payload (the _id in this case).
-    Is not expired.
-
-
-    Correct, the verification part in this code does not directly involve the database. Here’s how it works:
-    Verification Process: When you use jwt.verify, you’re verifying the token’s structure, signature, and expiration status based solely on the token itself and the secret key (ACCESS_TOKEN_SECRET). This step ensures:
-    The token was issued by your server (because it was signed with your secret).
-    The token validity (whether it's expired or not) is determined during the jwt.verify process. Here’s how that works:
-    Expiration Check: When you created the token, you set an expiration time (expiresIn) in the token options. This expiration is embedded within the token's payload.
-    jwt.verify Process: When jwt.verify is called on the token, the library automatically checks the current time against the expiration time inside the token:
-    */
   try {
     const decodedToken = jwt.verify(
       incomingRefrehToken,
@@ -303,8 +254,6 @@ const refreshAccessToken = asynHandler(async (req, res) => {
 });
 
 const changeCurrentPassowrd = asynHandler(async (req, res) => {
-  //the user will enter this 2 filed on the frontend
-  //can also add confirm password
   const { oldPassword, newPassword } = req.body;
   // if(newPassword !== confPassword){
   //     throw new ApiError...
@@ -427,9 +376,6 @@ const getUserChannelProfile = asynHandler(async (req, res) => {
     throw new ApiError(400, "Username is not correct!!");
   }
   console.log(username);
-  // User.find(username) to refine it more we will directly apply aggregation bcoz we can use match directly there
-  //we get array in return from aggregate the array can also contain objedt
-  //here User all fields like username,fullname,etc are already found
   const channel = await User.aggregate([
     {
       $match: {
@@ -497,13 +443,6 @@ const getUserChannelProfile = asynHandler(async (req, res) => {
   if (!channel?.length) {
     throw new ApiError(400, "Channel does not exist");
   }
-  /*
-    Why to lowercase is used
-    Converting to lowercase is important to ensure case-insensitive matching when querying the database. Here's why this matters:
-    Consistency in Matching: Databases, by default, can be case-sensitive, meaning "JohnDoe" and "johndoe" would be treated as different values. 
-    Converting the input to lowercase ensures that a username match works regardless of capitalization. This way, if a user searches for johndoe but the stored username is JohnDoe, the query will still find it.
-    */
-
   //we are only returning one value of channel but it has many only 1 is returned for frontend develpor to see the names and values so he can just apply then
   //makes it easy for frontend user can also return full channel
   return res
@@ -519,9 +458,6 @@ const getWatchHistory = asynHandler(async (req, res) => {
   const user = await User.aggregate([
     {
       $match: {
-        //you cannot directly use a method like User.findById(userId) because aggregation is meant to work with MongoDB operators and expressions hence outiside it works but not inside here
-        //why this as till now we were getting ids string value that was in _id Object
-        //mongoose was use to convert it to objectId but here it wont happen then so we create mongoose id here
         _id: req.user._id, //as its already in object id format
       },
     },
@@ -531,21 +467,6 @@ const getWatchHistory = asynHandler(async (req, res) => {
         localField: "watchHistory",
         foreignField: "_id",
         as: "watchHistory",
-        /*
-                    Imagine you have two lists:
-
-                    One list called users, which has people's information like their name and the IDs of videos they've watched.
-                    Another list called videos, which has information about each video, like who made it and its title.
-                    What We Want to Do:
-                    We want to find all the videos a specific user has watched, and for each of those videos, we also want to know more about who made it (the creator).
-
-                    How It Works:
-                    First $lookup: We look at the users list and find the user we're interested in. We use their watchHistory to find matching videos in the videos list. This tells us,
-                    “Here are the videos this person watched.”
-
-                    Nested $lookup: For each video we find, we do another lookup to find out who made it by checking the owner field in the videos list. 
-                    This matches the owner with an _id in the users list so we can include information like the creator's name or profile.
-                    */
         pipeline: [
           {
             $lookup: {
@@ -601,35 +522,3 @@ export {
   getUserChannelProfile,
   getWatchHistory,
 };
-
-//Access and Refresh token and why in cookies
-/*
-nd also when we can send in json return why are we sending cokkies?
-ChatGPT said:
-ChatGPT
-Good question! Here’s why cookies are often preferred over sending tokens directly in the JSON response for storing sensitive tokens like access and refresh tokens:
-
-1. Security:
-HttpOnly Cookies: By sending tokens in cookies with the httpOnly flag set to true, we protect them from JavaScript access on the frontend. This reduces the risk of client-side attacks, such as Cross-Site Scripting (XSS), since JavaScript cannot access or manipulate httpOnly cookies.
-Secure Flag: The secure flag ensures that cookies are only sent over HTTPS connections, further enhancing security.
-2. Consistency Across Requests:
-When tokens are stored in cookies, they automatically get included in each HTTP request to the server (for the same domain) without requiring explicit management in frontend code. This is particularly helpful when dealing with APIs because it simplifies how tokens are handled on the client side.
-Cookies can also simplify handling requests to protected endpoints, as the client doesn’t need to include the token manually in every request (e.g., in headers).
-3. Compliance and Best Practices:
-Many applications, especially those that need to comply with security standards or regulations, favor cookies for sensitive tokens because they offer a more standardized way to control token access and enhance security.
-When to Use JSON Instead of Cookies
-In some cases, sending tokens directly in a JSON response is useful:
-
-Single-Page Applications (SPAs) often handle tokens locally (in memory or local storage) for flexibility, particularly if they don’t rely on cookies for managing sessions.
-Token Management: Sending tokens in JSON can be useful for SPAs needing fine-grained control over token renewal and storage, but this can expose tokens to client-side risks like XSS.
-
-
-When both the access token and refresh token are stored in httpOnly cookies, the frontend doesn’t have direct access to these tokens. However, this setup allows the server and frontend to handle user authentication without requiring the user to re-enter their password each time a token expires. Here’s how it works:
-
-1. Initial Login Request
-When the user first logs in with their credentials (username and password), the server verifies the credentials and then generates an access token and a refresh token.
-The server sends these tokens back as httpOnly cookies, which means the frontend can’t access them directly via JavaScript. However, these cookies are automatically included in all future HTTP requests to the server for the same domain.
-2. Making Authenticated Requests
-For each subsequent request, such as fetching user data or accessing a protected route, the browser automatically sends the httpOnly access token cookie along with the request.
-The server checks this access token to verify if the user is authenticated. If the token is valid, the server processes the request and sends the data back.
-*/

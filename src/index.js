@@ -19,34 +19,4 @@ connectDB()
     console.log("Mongo DB error Occured : ", error);
   });
 
-/*
-// import { DB_NAME } from './constants' for 1st way of db connection
-//1] way 1 for db connection
 
-// making the func and then calling it instead use self calling fucntion
-// function connectDB(){}
-// connectDB();
-
-// (async ()=>{
-//     try{
-//         //here the format is URL and the name of the database you want 
-//         await mongoose.connect(`${process.env.MONGODB_URI}/${DB_NAME}`)
-//         //here we will use on listner to check specifficly that is the express able to talk to databse
-//         app.on("error",(error)=>{
-//             console.log("ERROR : ",error);
-//             throw error;  
-//         })
-
-//         //if no problem then do app.listen basic one 
-//         app.listen(process.env.PORT,()=>{
-//             console.log(`http://localhost:${process.env.PORT}`);
-            
-//         })
-
-//     }catch(error){
-//         console.log("Error : ", error);
-//         throw error ;
-//     }
-
-// })()
-*/

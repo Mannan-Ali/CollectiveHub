@@ -121,9 +121,17 @@ dist
 
 
 #custom files
+src/middlewares/commentsForauth.middleware.js
+src/middlewares/commentsFormulter.middleware.js
 
-# middleware
-src/middlewares/copyauth.middleware.js
-src/middlewares/copymulter.middleware.js
+src/controllers/commentsForUser.controller.js
 
+src/models/commentsForUser.model.js
 
+src/commentsForApp.js
+
+src/commentsForIndex.js
+
+src/utils/commentsForasybcHandler.js
+
+src/utils/commentsForcloudinary.js
