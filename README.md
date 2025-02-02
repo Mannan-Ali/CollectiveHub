@@ -3,7 +3,6 @@
 **CollectiveHub** is a backend-driven platform that combines the core logic of social media (like Twitter) and video-sharing platforms (like YouTube).The project that allows users to upload, share and interact with multimedia (videos/images), and incorporate
 features such as tweets, subscriptions, comments and likes.
 
-<br/>
 
 ## 📜 Features
 
@@ -16,7 +15,6 @@ features such as tweets, subscriptions, comments and likes.
 - **Search Using Pagination **: Users can search for content and see a feed of uploaded videos/images.
 - **Real-Time Updates**: Notification-like feature for user engagement.
 
-<br/>
 
 ## 🚀 Installation and Setup
 
