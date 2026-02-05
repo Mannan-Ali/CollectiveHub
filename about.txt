@@ -120,19 +120,23 @@ Inside Source:
    so what we can do is pss it like this (req,_, next)
 
 17. WHY USING COOKIES IS BETTER AND SECURE OF ACCESS AND REFRESH TOKENS :
-    When you set tokens in secure cookies, you’re adding a layer of protection, especially if you configure the cookies with specific attributes to limit visibility and access. Here’s how it works and what the risks are:
+    When you set tokens in secure cookies, you’re adding a layer of protection, especially if you configure the cookies with specific attributes to limit visibility and access. 
+    Here’s how it works and what the risks are:
 
    Can Users See Secure Cookies?
-   HTTP-Only Attribute: By setting httpOnly: true on the cookies, they are inaccessible to JavaScript on the client side. This attribute prevents users from directly reading or modifying the tokens through client-side scripts. However, users can still see the cookies through their browser's developer tools, especially if they view the "Cookies" section.
+   HTTP-Only Attribute: By setting httpOnly: true on the cookies, they are inaccessible to JavaScript on the client side. This attribute prevents users from directly reading 
+   or modifying the tokens through client-side scripts. However, users can still see the cookies through their browser's developer tools, especially if they view the "Cookies" section.
 
    Secure Attribute: By setting secure: true, the cookies are only sent over HTTPS connections, which protects them from being exposed over unencrypted HTTP requests.
 
-   User Access to Cookies: While users can see the values of secure cookies through browser developer tools, they cannot directly modify the cookies to send manipulated tokens to your server. Any modifications or tampering would invalidate the token signature, causing the server to reject it.
+   User Access to Cookies: While users can see the values of secure cookies through browser developer tools, they cannot directly modify the cookies to send manipulated tokens to your server. 
+   Any modifications or tampering would invalidate the token signature, causing the server to reject it.
 
    Risks of Users Seeing Token Values
    Even though users can view their tokens in developer tools, they can’t easily tamper with them. Here’s why:
 
-   JWT Signature: The tokens are signed with your server’s secret key, making it almost impossible for users to alter the token without invalidating it. Any changes to the token payload (e.g., changing user_id) would result in a signature mismatch. When your server verifies the token, it would detect this tampering and reject the token.
+   JWT Signature: The tokens are signed with your server’s secret key, making it almost impossible for users to alter the token without invalidating it. Any changes to the token payload (e.g., changing user_id) would result in a signature mismatch. 
+   When your server verifies the token, it would detect this tampering and reject the token.
 
    Refresh Token Misuse: If a user were to steal their own refresh token and attempt to use it outside of your application, they could potentially refresh their session repeatedly. To mitigate this risk, consider:
 
